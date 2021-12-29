@@ -2,8 +2,8 @@
   "name": "vite-electron-builder",
   "private": true,
   "engines": {
-    "node": ">=v16.13",
-    "npm": ">=8.1"
+    "node": ">=14",
+    "npm": ">=7.1"
   },
   "main": "packages/main/dist/index.cjs",
   "scripts": {
@@ -34,6 +34,8 @@
     "eslint-plugin-vue": "8.2.0",
     "nano-staged": "0.5.0",
     "playwright": "1.17.1",
+    "sass": "^1.45.1",
+    "sass-loader": "^12.4.0",
     "simple-git-hooks": "2.7.0",
     "typescript": "4.5.4",
     "vite": "2.7.7",
@@ -42,6 +44,9 @@
   "dependencies": {
     "electron-updater": "4.6.5",
     "vue": "3.2.26",
-    "vue-router": "4.0.12"
+    "vue-clipboard2": "^0.3.3",
+    "vue-i18n": "^8.26.8",
+    "vue-router": "4.0.12",
+    "vuex": "^4.0.2"
   }
 }
