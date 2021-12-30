@@ -1,22 +1,19 @@
 <template>
-  <img
-    alt="Vue logo"
-    src="../assets/logo.svg"
-    width="300"
-  >
+  <img alt="Vue logo" src="../assets/logo.svg" width="300" />
   <app-navigation />
   <router-view />
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import AppNavigation from '/@/components/AppNavigation.vue';
+import { defineComponent } from 'vue'
+
+import AppNavigation from '/@/components/AppNavigation.vue'
 export default defineComponent({
   name: 'App',
   components: {
     AppNavigation,
   },
-});
+})
 </script>
 
 <style>
