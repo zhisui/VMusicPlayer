@@ -1,11 +1,13 @@
 /* eslint-env node */
 
-import {chrome} from '../../.electron-vendors.cache.json';
-import {join} from 'path';
-import {builtinModules} from 'module';
-import vue from '@vitejs/plugin-vue';
+import { builtinModules } from 'module'
+import { join } from 'path'
 
-const PACKAGE_ROOT = __dirname;
+import vue from '@vitejs/plugin-vue'
+
+import { chrome } from '../../.electron-vendors.cache.json'
+
+const PACKAGE_ROOT = __dirname
 
 /**
  * @type {import('vite').UserConfig}
@@ -32,13 +34,11 @@ const config = {
     outDir: 'dist',
     assetsDir: '.',
     rollupOptions: {
-      external: [
-        ...builtinModules,
-      ],
+      external: [...builtinModules],
     },
     emptyOutDir: true,
     brotliSize: false,
   },
-};
+}
 
-export default config;
+export default config
