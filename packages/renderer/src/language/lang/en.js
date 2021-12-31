@@ -1,4 +1,3 @@
-
 export default {
   nav: {
     home: 'Home',
@@ -10,4 +9,4 @@ export default {
     login: 'Login',
     github: 'Github Repository',
   },
-};
+}
