@@ -24,6 +24,7 @@
     "@changesets/cli": "^2.18.0",
     "@commitlint/cli": "^14.1.0",
     "@commitlint/config-conventional": "^14.1.0",
+    "@iconify/vue": "^3.1.1",
     "@quitsmx/eslint-config": "^0.5.5",
     "@types/electron-devtools-installer": "2.2.1",
     "@types/eslint": "^7.28.2",
@@ -49,9 +50,9 @@
     "eslint-plugin-vue": "8.2.0",
     "nano-staged": "0.5.0",
     "playwright": "1.17.1",
+    "prettier": "git@github.com:aMarCruz/prettier.git",
     "sass": "^1.45.1",
     "sass-loader": "^12.4.0",
-    "prettier": "https://github.com/aMarCruz/prettier.git",
     "simple-git-hooks": "2.7.0",
     "typescript": "4.5.4",
     "vite": "2.7.7",
@@ -60,9 +61,10 @@
   },
   "dependencies": {
     "electron-updater": "4.6.5",
+    "lodash-es": "^4.17.21",
     "vue": "3.2.26",
     "vue-clipboard2": "^0.3.3",
-    "vue-i18n": "^8.26.8",
+    "vue-i18n": "^9.1.7",
     "vue-router": "4.0.12",
     "vuex": "^4.0.2"
   }

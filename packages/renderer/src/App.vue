@@ -1,28 +1,34 @@
 <template>
-  <img alt="Vue logo" src="../assets/logo.svg" width="300" />
-  <app-navigation />
-  <router-view />
+  <div class="container">
+    <header class="container_header">
+      <NavBar />
+    </header>
+    <main class="container_main">
+      <router-view></router-view>
+    </main>
+    <footer class="container_footer">
+      footer
+    </footer>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import AppNavigation from '/@/components/AppNavigation.vue'
+import NavBar from './components/NavBar.vue'
 export default defineComponent({
   name: 'App',
   components: {
-    AppNavigation,
+    NavBar,
   },
 })
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style scoped>
+.container_header .container_footer {
+  flex-shrink: 0;
+}
+.container_main {
+  flex-grow: 1;
 }
 </style>

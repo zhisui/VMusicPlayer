@@ -3,9 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "/@/*": [
-        "./src/*"
-      ]
+      "/@/*": ["./src/*"]
     },
     "lib": ["ESNext", "dom", "dom.iterable"]
   },
@@ -16,6 +14,9 @@
     "src/**/*.tsx",
     "types/**/*.d.ts",
     "../../types/**/*.d.ts",
-    "../preload/exposedInMainWorld.d.ts"
+    "../preload/exposedInMainWorld.d.ts",
+    "src/language/lang/zh-TW.js",
+    "src/language/lang/zh-CN.js",
+    "src/language/lang/en.js"
   ]
 }

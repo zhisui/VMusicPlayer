@@ -9,4 +9,5 @@ export default {
     login: '退出',
     github: 'Github仓库',
   },
+  home: '首页',
 }
