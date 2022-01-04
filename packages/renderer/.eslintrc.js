@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-check
 // const config = require('@quitsmx/eslint-config')
 
 /**
@@ -15,8 +15,6 @@ const rules = {
   'vue/first-attribute-linebreak': 'off',
   'vue/html-self-closing': 'off',
   'vue/singleline-html-element-content-newline': 'off',
-  'no-duplicate-imports': 0,
-
   'vue/max-attributes-per-line': [
     'error',
     {

@@ -2,12 +2,12 @@
   <div class="container">
     <!-- 左边箭头 -->
     <div class="nav-arrows">
-      <iconButton>
+      <IconButton>
         <Icon icon="dashicons:arrow-left-alt2" width="30" class="icon" />
-      </iconButton>
-      <iconButton>
+      </IconButton>
+      <IconButton>
         <Icon icon="dashicons:arrow-right-alt2" width="30" class="icon" />
-      </iconButton>
+      </IconButton>
     </div>
     <!-- 中间 -->
     <div class="nav-middle">
@@ -29,10 +29,11 @@ import { Icon } from '@iconify/vue'
 import { defineComponent } from 'vue'
 
 import IconButton from './IconButton.vue'
+
 export default defineComponent({
   name: 'NavBar',
   components: {
-    IconButton,
+    IconButton: IconButton,
     Icon,
   },
   data () {
