@@ -1,11 +1,9 @@
 <template>
-  <h1>{{ $t('home') }}</h1>
+  <h1>设置</h1>
 </template>
 <script>
 import { defineComponent } from 'vue'
-
 export default defineComponent({
-  name: 'HomePage',
-  components: {},
+  name: 'SettingPage',
 })
 </script>

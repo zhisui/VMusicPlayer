@@ -15,8 +15,9 @@
     "types/**/*.d.ts",
     "../../types/**/*.d.ts",
     "../preload/exposedInMainWorld.d.ts",
-    "src/language/lang/zh-TW.js",
-    "src/language/lang/zh-CN.js",
-    "src/language/lang/en.js"
+    "src/locales/lang/zh-TW.js",
+    "src/locales/lang/zh-CN.js",
+    "src/locales/lang/en.js",
+    "src/assets/icons/index.js"
   ]
 }

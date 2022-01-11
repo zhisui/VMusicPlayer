@@ -45,5 +45,9 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "deno.suggest.imports.hosts": {
     "https://deno.land": false
-  }
+  },
+  "i18n-ally.localesPaths": [
+    "packages/renderer/src/language",
+    "packages/renderer/src/language/lang"
+  ]
 }

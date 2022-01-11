@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div id="app">
     <header class="container_header">
       <NavBar />
     </header>
@@ -25,10 +25,17 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-.container_header .container_footer {
-  flex-shrink: 0;
+<style lang="scss" scoped>
+#app {
+  width: 100%;
+  transition: all 0.4s;
 }
+
+.container_header {
+  position: sticky;
+  top: 0;
+}
+
 .container_main {
   flex-grow: 1;
 }

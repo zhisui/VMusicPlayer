@@ -11,10 +11,24 @@ const rules = {
   'react/react-in-jsx-scope': 'off',
   'sort-imports': 'off',
   'no-void': 'off',
+  'no-alert': 'off',
+  'promise/no-nesting': 'off',
+  'no-useless-escape': 'off',
+  'default-case': 'off',
+  'promise/catch-or-return': 'off',
+  'no-empty': 'off',
+  'unicorn/no-unsafe-regex': 'off',
   '@typescript-eslint/no-floating-promises': 'off',
+  '@typescript-eslint/no-unsafe-return': 'off',
   'vue/first-attribute-linebreak': 'off',
   'vue/html-self-closing': 'off',
   'vue/singleline-html-element-content-newline': 'off',
+  'vue/multi-word-component-names': [
+    'error',
+    {
+      ignores: [],
+    },
+  ],
   'vue/max-attributes-per-line': [
     'error',
     {
