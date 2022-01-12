@@ -57,57 +57,45 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { defineComponent } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import DropdownMenu from './DropdownMenu.vue'
 import IconButton from './IconButton.vue'
 
-export default defineComponent({
-  name: 'NavBar',
-  components: {
-    IconButton: IconButton,
-    Icon,
-    DropdownMenu,
-  },
-  data () {
-    return {
-      inputFocus: false,
-      langs: ['zh-CN', 'zh-TW', 'en'],
-      keywords: '',
-      showMenu: false,
-    }
-  },
+const inputFocus = ref(false)
+const showMenu = ref(false)
+const keywords = ref('')
+const router = useRouter()
 
-  computed: {
-    avatarUrl () {
-      return 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60'
-    },
-  },
+const go = (where) => {
+  if (where === 'back') {
+    router.go(-1)
+  } else {
+    router.go(1)
+  }
+}
 
-  methods: {
-    go (where) {
-      if (where === 'back') {
-        this.$router.go(-1)
-      } else {
-        this.$router.go(1)
-      }
-    },
+const doSearch = () => {
+  console.log('ssss')
+}
 
-    doSearch () {
-      console.log('ssss')
-    },
-    toSetting () {
-      this.$router.push({ name: 'setting' })
-    },
-    toLogin () {
-      this.$router.push({ name: 'login' })
-    },
-    toGithub () {
-      window.open('https://github.com/zhisui/VMusicPlayer')
-    },
-  },
+const toSetting = () => {
+  router.push({ name: 'setting' })
+}
+
+const toLogin = () => {
+  router.push({ name: 'login' })
+}
+
+const toGithub = () => {
+  window.open('https://github.com/zhisui/VMusicPlayer')
+}
+
+const avatarUrl = computed(() => {
+  return 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60'
 })
 </script>
 
