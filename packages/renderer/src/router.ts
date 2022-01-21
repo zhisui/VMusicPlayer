@@ -15,6 +15,11 @@ const routes = [
     component: async () => import('/@/views/library.vue'),
   },
   {
+    path: '/library/like-songs',
+    name: 'likeSongs',
+    component: async () => import('/@/views/playlist.vue'),
+  },
+  {
     path: '/setting',
     name: 'setting',
     component: async () => import('/@/views/setting.vue'),

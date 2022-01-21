@@ -20,6 +20,7 @@ const config = {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
     },
+    extensions: ['.js', '.json', '.ts'],
   },
   plugins: [vue()],
   base: '',

@@ -1,7 +1,7 @@
 import request from '../utils/request'
 
-// 注意：以下url为网易云音乐对应接口，不可随意更改
-// @see https://neteasecloudmusicapi.vercel.app/#/?id=%e7%99%bb%e5%bd%95
+/** 注意：以下url为网易云音乐对应接口，不可随意更改
+ @see https://neteasecloudmusicapi.vercel.app/#/?id=%e7%99%bb%e5%bd%95 */
 
 // 手机登录
 type PhoneParams = {
@@ -47,6 +47,7 @@ export async function loginQrCodeKey () {
 type QrCodeparams = {
   key: string
   qring?: string // 传入后会额外返回二维码图片base64编码
+  timeStamp?: number
 }
 export async function createQrCode (params: QrCodeparams) {
   return request({

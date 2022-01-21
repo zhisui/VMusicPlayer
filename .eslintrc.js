@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck
 // const config = require('@quitsmx/eslint-config')
 
 /**
@@ -11,6 +11,11 @@ const rules = {
   'react/react-in-jsx-scope': 'off',
   'sort-imports': 'off',
   'no-void': 'off',
+  'no-shadow': 'off',
+  'complexity': 'off',
+  '@typescript-eslint/no-var-requires': 'off',
+  '@typescript-eslint/no-require-imports': 'off',
+  '@typescript-eslint/no-unsafe-call': 'off',
   '@typescript-eslint/no-floating-promises': 'off',
 }
 

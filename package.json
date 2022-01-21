@@ -68,7 +68,9 @@
   "dependencies": {
     "axios": "^0.24.0",
     "crypto-js": "^4.1.1",
+    "dexie": "^3.2.0",
     "electron-updater": "4.6.5",
+    "howler": "^2.2.3",
     "js-cookie": "^3.0.1",
     "lodash-es": "^4.17.21",
     "md5": "^2.3.0",
