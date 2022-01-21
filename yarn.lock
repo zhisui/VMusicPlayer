@@ -2695,6 +2695,11 @@
   "resolved" "https://registry.npmjs.org/detect-node/-/detect-node-2.1.0.tgz"
   "version" "2.1.0"
 
+"dexie@^3.2.0":
+  "integrity" "sha512-OpS8ss1CLHYAhxRu6hT+/Gt1uLhKCf0O18xHBdRGlemOWXXRiiOZ0ty1/bACIJzGt1DGmvarzrPwYYt9EkRZfw=="
+  "resolved" "https://registry.npmjs.org/dexie/-/dexie-3.2.0.tgz"
+  "version" "3.2.0"
+
 "diff@^4.0.1":
   "integrity" "sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A=="
   "resolved" "https://registry.npmjs.org/diff/-/diff-4.0.2.tgz"
@@ -4067,6 +4072,11 @@
   "version" "4.0.2"
   dependencies:
     "lru-cache" "^6.0.0"
+
+"howler@^2.2.3":
+  "integrity" "sha512-QM0FFkw0LRX1PR8pNzJVAY25JhIWvbKMBFM4gqk+QdV+kPXOhleWGCB6AiAF/goGjIHK2e/nIElplvjQwhr0jg=="
+  "resolved" "https://registry.npmjs.org/howler/-/howler-2.2.3.tgz"
+  "version" "2.2.3"
 
 "html-element-attributes@2.3.0":
   "integrity" "sha512-RJv2v3BBaYSc0ODHwT0sqWI+2lFs6DATBvCRnW20BDmULxoAWvfT6r28uL8LcW1a9/eqUl+1DccUOJzw00qVXQ=="

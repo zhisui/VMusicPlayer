@@ -2,10 +2,8 @@ import Cookies from 'js-cookie'
 
 import store from '../store'
 
-// 未知待写
 export function setCookie (key: string) {
   const cookies = key.split(';;')
-  console.log(cookies)
   cookies.forEach((cookie) => {
     document.cookie = cookie
     const cookieKeyValue = cookie.split(';')[0].split('=')
@@ -22,7 +20,7 @@ export function removeCookie (key: string) {
   localStorage.removeItem(`cookie-${key}`)
 }
 
-// 在登录成功状态设有cookie 名MUSIC_U，以下返回true表示处于登录状态
+// 在登录成功后后服务器会返回cookie,可将cookie写入本地
 export function isLogin () {
   return getCookie('MUSIC_U') !== undefined
 }

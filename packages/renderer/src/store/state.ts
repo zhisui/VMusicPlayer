@@ -1,3 +1,4 @@
+import { userPlaylist } from './../api/user'
 import initLocalStorage from './initLocalStorage'
 
 if (localStorage.getItem('data') === null) {
@@ -9,7 +10,16 @@ if (localStorage.getItem('setting') === null) {
 }
 
 export default {
+  liked: {
+    songs: [],
+    playlists: [],
+    albums: [],
+    artists: [],
+    mvs: [],
+    songsWithDetails: [],
+  },
   enableScrolling: true,
   data: JSON.parse(localStorage.getItem('data')!),
   setting: JSON.parse(localStorage.getItem('setting')!),
+  player: JSON.parse(localStorage.getItem('player')!),
 }

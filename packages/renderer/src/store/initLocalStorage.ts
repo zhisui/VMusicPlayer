@@ -1,4 +1,5 @@
 const localStorage = {
+  player: {},
   setting: {
     proxyConfig: {
       protocol: 'noProxy',
@@ -9,7 +10,7 @@ const localStorage = {
   data: {
     user: {},
     lastRefreshCookieDate: 0,
-    LoginMode: null,
+    loginMode: null,
   },
 }
 export default localStorage
