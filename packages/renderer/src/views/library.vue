@@ -56,7 +56,7 @@ const liked = store.state.liked
 const lyric = ref(undefined) // 字符串类型
 
 // const pickedLyric = computed(() => {
-//   console.log(lyric.value);
+//   console.log(lyric.value)
 //   if (!lyric.value) return []
 //   const lyricLine = lyric.value
 //     .split('\n')

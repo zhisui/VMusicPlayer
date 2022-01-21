@@ -109,8 +109,8 @@ export default defineComponent({
       inputFocus: '',
       phoneNumber: '18767173965',
       countryCode: '+86',
-      email: '',
-      password: '123456',
+      email: 'vmusic2022@163.com',
+      password: 'Vmusic123',
       processing: false,
       qrCodeImage: '',
       qrCodeKey: '',
@@ -239,8 +239,8 @@ export default defineComponent({
         this.updateData({ key: 'user', value: data.profile })
 
         this.fetchLikedPlaylist().then((res) => {
-          this.updateLikedXXX({ name: 'playlists', data: res.playlist })
-          this.updateData({ key: 'likedSongPlaylistID', value: res.playlist[0].id })
+          // this.updateLikedXXX({ name: 'playlists', data: res.playlist })
+          // this.updateData({ key: 'likedSongPlaylistID', value: res.playlist[0].id })
           this.$router.push({ name: 'library' })
         })
       } else {
@@ -347,7 +347,7 @@ export default defineComponent({
     text-align: center;
     display: flex;
     border-radius: 10px;
-    width: 250px;
+    width: 300px;
     background-color: var(--second-bg-color-transparent);
     padding: 10px;
     margin-bottom: 25px;
@@ -390,7 +390,7 @@ export default defineComponent({
   .login-button {
     padding: 10px;
     border-radius: 8px;
-    width: 270px;
+    width: 320px;
     text-align: center;
     font-size: 18px;
     font-weight: 600;
