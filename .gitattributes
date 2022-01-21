@@ -8,6 +8,7 @@ scripts/*.js linguist-detectable=false
 * text=auto
 * text eol=lf
 # Don't do anything with binaries
+*.icns binary
 *.png binary
 *.jpg binary
 *.svg binary
