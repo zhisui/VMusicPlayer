@@ -47,6 +47,7 @@
             <Icon icon="ls:login" class="icon" />
             登录
           </div>
+          <!-- 退出的情况待写 -->
           <div class="item" @mousedown="toGithub">
             <Icon icon="grommet-icons:github" class="icon" />
             Github
@@ -61,6 +62,7 @@
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 import DropdownMenu from './DropdownMenu.vue'
 import IconButton from './IconButton.vue'
@@ -68,6 +70,9 @@ import IconButton from './IconButton.vue'
 const inputFocus = ref(false)
 const showMenu = ref(false)
 const keywords = ref('')
+/* eslint-disable new-cap */
+const store = new useStore()
+const state = store.state
 const router = useRouter()
 
 const go = (where) => {
@@ -95,7 +100,9 @@ const toGithub = () => {
 }
 
 const avatarUrl = computed(() => {
-  return 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60'
+  return state.data?.user?.avatarUrl
+    ? `${state.data?.user?.avatarUrl}?param=512y512`
+    : 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60'
 })
 </script>
 

@@ -14,11 +14,11 @@ const routes = [
     name: 'library',
     component: async () => import('/@/views/library.vue'),
   },
-  {
-    path: '/library/like-songs',
-    name: 'likeSongs',
-    component: async () => import('/@/views/playlist.vue'),
-  },
+  // {
+  //   path: '/library/like-songs',
+  //   name: 'likeSongs',
+  //   component: async () => import('/@/views/playlist.vue'),
+  // },
   {
     path: '/setting',
     name: 'setting',
