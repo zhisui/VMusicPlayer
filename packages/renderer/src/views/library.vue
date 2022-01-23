@@ -42,9 +42,9 @@ import { Icon } from '@iconify/vue'
 import NProgress from 'nprogress'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
 
 import { getLyric } from '../api/track.ts'
+import { useStore } from '../store/index.ts'
 import { randomNum } from '../utils/common.ts'
 /* eslint-disable new-cap */
 const store = new useStore()

@@ -1,11 +1,13 @@
-import { createStore } from 'vuex'
+import { InjectionKey } from 'vue'
+import { createStore, Store, useStore as baseUseStore } from 'vuex'
 
-import Player from '../utils/player'
+import Player from '../utils/Player'
 import actions from './actions'
 import mutations from './mutations'
-import state from './state'
-
-const store = createStore({
+import { State, state } from './state'
+// eslint-disable-next-line symbol-description
+export const key: InjectionKey<Store<State>> = Symbol()
+const store = createStore<State>({
   state,
   mutations,
   actions,
@@ -25,3 +27,7 @@ player = new Proxy(player, {
 store.state.player = player
 
 export default store
+
+export function useStore () {
+  return baseUseStore(key)
+}

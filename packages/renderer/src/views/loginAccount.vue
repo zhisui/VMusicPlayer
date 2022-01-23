@@ -201,32 +201,6 @@ export default defineComponent({
       }
     },
 
-    // 处理请求的响应体 待写，需要看下响应数据
-    // handleLoginResponse(data) {
-    //   if (!data) {
-    //     this.processing = false
-    //     return
-    //   }
-    //   if (data.code === 200) {
-    //     this.informationData = data
-    //     setCookie(data.cookie)
-    //     this.updateData({ key: 'loginMode', value: 'account' })
-    //     console.log(this.$store.state.data);
-    //     this.fetchUserProfile().then(() => {
-    //       console.log(this.$store.state.data);
-    //       this.fetchLikedPlaylist().then(() => {
-    //         console.log(this.$store.state.data);
-    //         this.$router.push({ name: 'library' })
-    //         console.log('登录成功');
-    //        })
-    //     })
-
-    //   } else {
-    //     this.processing = false
-    //     window.alert(data.msg ?? data.message ?? '账号或密码错误，请检查')
-    //   }
-    // },
-
     handleLoginResponse (data) {
       if (!data) {
         this.processing = false
@@ -238,9 +212,7 @@ export default defineComponent({
         this.updateData({ key: 'loginMode', value: 'account' })
         this.updateData({ key: 'user', value: data.profile })
 
-        this.fetchLikedPlaylist().then((res) => {
-          // this.updateLikedXXX({ name: 'playlists', data: res.playlist })
-          // this.updateData({ key: 'likedSongPlaylistID', value: res.playlist[0].id })
+        this.fetchLikedPlaylist().then(() => {
           this.$router.push({ name: 'library' })
         })
       } else {

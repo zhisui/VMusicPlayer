@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie'
 
-import { getTrackDetail } from '/@/api/track'
+import { getTrackDetail } from '@/api/track'
 
 export interface Common {
   id?: number

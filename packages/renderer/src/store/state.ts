@@ -9,7 +9,22 @@ if (localStorage.getItem('setting') === null) {
   localStorage.setItem('seeting', JSON.stringify(initLocalStorage.setting))
 }
 
-export default {
+export interface State {
+  liked: {
+    songs: number[]
+    playlists: any[]
+    albums: any[]
+    artists: any[]
+    mvs: any[]
+    songsWithDetails: any[]
+  }
+  enableScrolling: boolean
+  data: unknown
+  setting: unknown
+  player: unknown
+}
+
+export const state: State = {
   liked: {
     songs: [],
     playlists: [],

@@ -1,5 +1,7 @@
-import { getPlaylistDetail } from '/@/api/playlist'
-import { getTrackDetail } from '/@/api/track'
+import { ActionTree } from 'vuex'
+
+import { getPlaylistDetail } from '@/api/playlist'
+import { getTrackDetail } from '@/api/track'
 import {
   likedAlbums,
   likedArtists,
@@ -7,11 +9,11 @@ import {
   userAccount,
   userLikedSongsIDs,
   userPlaylist,
-} from '/@/api/user'
-import { isAccountLogin } from '/@/utils/auth'
-import { mapTrackPlayableStatus } from '/@/utils/common'
+} from '@/api/user'
+import { isAccountLogin } from '@/utils/auth'
+import { mapTrackPlayableStatus } from '@/utils/common'
 
-export default {
+const action: ActionTree<S, R> = {
   // 获取用户信息，更新data中的user
   fetchUserProfile ({ commit }) {
     if (!isAccountLogin()) return
@@ -23,24 +25,22 @@ export default {
   },
 
   // 获取喜欢的歌单,更新liked和data中的likedSongPlaylistID
-  fetchLikedPlaylist ({ state, commit }) {
+  async fetchLikedPlaylist ({ state, commit }) {
     if (!isAccountLogin()) return
-    return userPlaylist({
+    const res = await userPlaylist({
       uid: state.data.user?.userId,
       limit: 1000,
     })
-    // .then((res) => {
-    //   if (res.playlist) {
-    //     commit('updateLikedXXX', {
-    //       name: 'playlists',
-    //       data: res.playlist,
-    //     })
-    //     commit('updateData', {
-    //       key: 'likedSongPlaylistID',
-    //       value: res.playlist[0].id,
-    //     })
-    //   }
-    // })
+    if (res.playlist) {
+      commit('updateLikedXXX', {
+        name: 'playlists',
+        data: res.playlist,
+      })
+      commit('updateData', {
+        key: 'likedSongPlaylistID',
+        value: res.playlist[0].id,
+      })
+    }
   },
 
   // 获取喜欢的所有歌曲id
@@ -101,6 +101,7 @@ export default {
       }
     })
   },
+
   // 获取喜欢的歌手、艺人
   fetchLikedArtists ({ commit }) {
     if (!isAccountLogin()) return
@@ -113,6 +114,7 @@ export default {
       }
     })
   },
+
   fetchLikedMVs ({ commit }) {
     if (!isAccountLogin()) return
     return likedMVs({ limit: 1000 }).then((result) => {
@@ -125,3 +127,5 @@ export default {
     })
   },
 }
+
+export default action

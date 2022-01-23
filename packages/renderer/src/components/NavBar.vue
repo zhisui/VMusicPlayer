@@ -62,8 +62,8 @@
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
 
+import { useStore } from '../store/index.ts'
 import DropdownMenu from './DropdownMenu.vue'
 import IconButton from './IconButton.vue'
 

@@ -2,7 +2,7 @@ import store from '../store'
 import { mapTrackPlayableStatus } from '../utils/common'
 import { db } from '../utils/db'
 
-import request from '/@/utils/request'
+import request from '@/utils/request'
 
 export const getTrackDetail = async (ids: string) => {
   const fetchLatest = () => {
