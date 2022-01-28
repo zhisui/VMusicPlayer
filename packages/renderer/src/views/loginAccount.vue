@@ -89,7 +89,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Icon } from '@iconify/vue'
 import md5 from 'crypto-js/md5'
 import NProgress from 'nprogress'
@@ -97,8 +97,8 @@ import QRCode from 'qrcode'
 import { defineComponent } from 'vue'
 import { mapActions, mapMutations } from 'vuex'
 
-import { checkQrCode, loginQrCodeKey, loginWithEmail, loginWithPhone } from '../api/auth.ts'
-import { setCookie } from '../utils/auth.ts'
+import { checkQrCode, loginQrCodeKey, loginWithEmail, loginWithPhone } from '@/api/auth'
+import { setCookie } from '@/utils/auth'
 
 export default defineComponent({
   name: 'LoginAccount',

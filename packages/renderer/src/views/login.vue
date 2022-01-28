@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Icon } from '@iconify/vue'
 import { defineComponent } from 'vue'
 export default defineComponent({
@@ -59,7 +59,7 @@ export default defineComponent({
     }
   },
   methods: {
-    goTo (path) {
+    goTo (path: string) {
       this.$router.push({ path: '/login/' + path })
     },
   },
