@@ -1,5 +1,6 @@
-import store from '../store'
+import { userDataStore } from './../store/userData'
 
+const store = userDataStore()
 const electron = require('electron')
 const ipcRenderer = electron.ipcRenderer
 
@@ -95,7 +96,7 @@ export default class {
   sendSelfToIpcMain () {
     ipcRenderer.send('player', {
       playing: this.playing,
-      likedCurrentTrack: store.state.liked.songs.includes(this._currentTrack.id),
+      likedCurrentTrack: store.liked.songs.includes(this._currentTrack.id),
     })
   }
 

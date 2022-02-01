@@ -12,17 +12,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
+<script setup lang="ts">
 import NavBar from '@/components/NavBar.vue'
-
-export default defineComponent({
-  name: 'App',
-  components: {
-    NavBar,
-  },
-})
 </script>
 
 <style lang="scss" scoped>

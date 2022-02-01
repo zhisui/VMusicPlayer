@@ -39,7 +39,8 @@
     ".huskyrc": "jsonc",
     ".prettierrc": "jsonc",
     ".commitlintrc": "jsonc",
-    ".lintstagedrc": "jsonc"
+    ".lintstagedrc": "jsonc",
+    ".vue": "vue"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,

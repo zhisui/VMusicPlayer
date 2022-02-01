@@ -10,7 +10,8 @@ type PhoneParams = {
   countryCode?: string
   md5_password?: string
 }
-export async function loginWithPhone (params: PhoneParams) {
+type LoginWithPhone = (params: PhoneParams) => Promise<any>
+export const loginWithPhone: LoginWithPhone = async (params) => {
   return request({
     url: '/login/cellphone',
     method: 'post',
@@ -24,7 +25,9 @@ type EmailParams = {
   password: string
   md5_password?: string
 }
-export async function loginWithEmail (params: EmailParams) {
+
+type LoginWithEmail = (params: EmailParams) => Promise<any>
+export const loginWithEmail: LoginWithEmail = async (params) => {
   return request({
     url: './login',
     method: 'post',
@@ -33,7 +36,9 @@ export async function loginWithEmail (params: EmailParams) {
 }
 
 // 生成二维码key值
-export async function loginQrCodeKey () {
+
+type LoginQrCodeKey = () => Promise<any>
+export const loginQrCodeKey: LoginQrCodeKey = async () => {
   return request({
     url: '/login/qr/key',
     method: 'get',
@@ -49,7 +54,8 @@ type QrCodeparams = {
   qring?: string // 传入后会额外返回二维码图片base64编码
   timeStamp?: number
 }
-export async function createQrCode (params: QrCodeparams) {
+type CreateQrCode = (params: QrCodeparams) => Promise<any>
+export const createQrCode: CreateQrCode = async (params) => {
   return request({
     url: '/login/qr/create',
     method: 'get',
@@ -64,7 +70,8 @@ export async function createQrCode (params: QrCodeparams) {
 轮询此接口可获取二维码扫码状态,800为二维码过期,801为等待扫码,802为待确认,
 803为授权登录成功(803状态码下会返回cookies)
 */
-export async function checkQrCode (key: string) {
+type CheckQrCode = (key: string) => Promise<any>
+export const checkQrCode: CheckQrCode = async (key: string) => {
   return request({
     url: '/login/qr/check',
     method: 'get',

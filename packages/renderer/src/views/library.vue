@@ -1,21 +1,25 @@
 <template>
-  <div class="container">
+  <div v-show="show" class="container">
     <h1>
-      <img :src="data.user.avatarUrl" />
-      {{ data.user.nickname }}的音乐库
+      <img :src="store.user.avatarUrl" />
+      {{ store.user.nickname }}的音乐库
     </h1>
     <div id="part1">
       <div class="musiclist">
         <div class="mylike" @click="tolikeSongsList">
           <div class="top">
-            <!-- <p v-for="(line, index) in pickedLyric" v-show="line !== ''" :key="line">
+            <p
+              v-for="(line, index) in pickedLyric"
+              v-show="line !== ''"
+              :key="line + index"
+            >
               {{ line }}
-            </p> -->
+            </p>
           </div>
           <div class="bottom">
             <div>
               <h2>我喜欢的音乐</h2>
-              <p>{{ liked.songs.length }}首歌</p>
+              <p>{{ store.liked.songs.length }}首歌</p>
             </div>
             <button>
               <Icon
@@ -29,7 +33,7 @@
           </div>
         </div>
 
-        <div class="songs" @click.stop="test">歌曲列表</div>
+        <div class="songs">歌曲列表</div>
       </div>
     </div>
 
@@ -37,73 +41,73 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import NProgress from 'nprogress'
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getLyric } from '../api/track.ts'
-import { useStore } from '../store/index.ts'
-import { randomNum } from '../utils/common.ts'
-/* eslint-disable new-cap */
-const store = new useStore()
+import { getLyric } from '@/api/track'
+import { userDataStore } from '@/store/userData'
+import { randomNum } from '@/utils/common'
+
+const store = userDataStore()
 const router = useRouter()
-const data = store.state.data
-const liked = store.state.liked
-// const show = ref(false)
+
+const show = ref<boolean>(false)
 // const likeSongs = ref([])
-const lyric = ref(undefined) // 字符串类型
+const lyric = ref<string>('')
+onMounted(async () => {
+  store.fetchLikedPlaylist()
+  store.fetchLikedSongsWithDetails()
+  store.fetchLikedArtists()
+  store.fetchLikedMVs()
+  store.fetchCloudDisk()
+  store.fetchPlayHistory()
+  await store.fetchLikedSongsIDs()
+  getRandomLyric()
+  NProgress.done()
+  show.value = true
+})
+console.log(store)
 
-// const pickedLyric = computed(() => {
-//   console.log(lyric.value)
-//   if (!lyric.value) return []
-//   const lyricLine = lyric.value
-//     .split('\n')
-//     .filter((line) => !line.includes('作词') && !line.includes('作曲'))
-//   // 最多显示3行歌词
-//   const lyricsToPick = Math.min(lyricLine.length, 3)
-//   const randomUpperBound = lyricLine.length - lyricsToPick
-//   const stratLyricLineIndex = randomNum(0, randomUpperBound - 1)
-//   // 将选中的3行以下歌词显示出来
-//   const lyrics = lyricLine
-//     .slice(stratLyricLineIndex, stratLyricLineIndex + lyricsToPick)
-//     .map((lir) => lir.split(']')[1].trim())
-//   console.log(lyrics)
-//   return lyrics
-// })
+const extractLyricPart = (rawLyric: string) => {
+  return rawLyric.split(']')[1].trim()
+}
+const pickedLyric = computed(() => {
+  if (!lyric.value) return []
+  const lyricLine = lyric.value
+    .split('\n')
+    .filter((line) => !line.includes('作词') && !line.includes('作曲'))
+  // 最多显示3行歌词
+  const lyricsToPick = Math.min(lyricLine.length, 3)
+  const randomUpperBound = lyricLine.length - lyricsToPick
+  const stratLyricLineIndex = randomNum(0, randomUpperBound - 1)
+  // 将选中的3行以下歌词显示出来
+  const lyrics = lyricLine
+    .slice(stratLyricLineIndex, stratLyricLineIndex + lyricsToPick)
+    .map(extractLyricPart)
+  return lyrics
+})
 
-const getRandomLyric = () => {
-  if (liked.songs.length === 0) return
-  getLyric(liked.songs[randomNum(0, liked.songs.length)]).then((res) => {
+const getRandomLyric = async () => {
+  const likedSongsIds = store.liked.songs
+  if (likedSongsIds.length === 0) return
+  await getLyric(likedSongsIds[randomNum(0, likedSongsIds.length)]).then((res) => {
     if (res.lrc !== undefined) {
-      const lyricWithDate = res.lrc.lyric
+      const isInstrumental = res.lrc.lyric
         .split('\n')
-        .filter((lyric) => !lyric.includes('纯音乐，请欣赏'))
-      if (lyricWithDate.length !== 0) lyric.value = res.lrc.lyric
-      console.log(lyric.value)
+        .filter((l: string) => l.includes('纯音乐，请欣赏'))
+      lyric.value =
+        isInstrumental.length === 0 ? res.lrc.lyric : '此曲只应天上有，人间能得几回闻'
     }
   })
 }
-getRandomLyric()
-
-const getData = () => {
-  store.dispatch('fetchLikedSongsWithDetails')
-  store.dispatch('fetchLikedSongsIDs')
-  store.dispatch('fetchLikedAlbums')
-  store.dispatch('fetchLikedArtists')
-  store.dispatch('fetchLikedMVs')
-  if (liked.songsWithDetails.length > 0) NProgress.done()
-}
-
-getData()
 
 // 路由部分
 const tolikeSongsList = () => {
   router.push({ name: 'likeSongs' })
 }
-
-// 去掉歌词的时间部分[00:27.66]软弱地被乖巧装扮着的颜色
 </script>
 
 <style lang="scss" scoped>
@@ -143,6 +147,11 @@ h1 {
     background-color: var(--primary-bg-color);
     .top {
       margin-bottom: 50px;
+      p {
+        font-size: 14px;
+        margin-bottom: -10px;
+        color: var(--primary-color);
+      }
     }
     .bottom {
       display: flex;

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import Player from '../utils/Player'
+import Player from '@/utils/Player'
 
 const playerStore = defineStore('player', {
   // arrow function recommended for full type inference
