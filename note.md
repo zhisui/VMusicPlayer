@@ -29,3 +29,16 @@ bug7:用 require('electroc')是会报错:require is undefinded
 nodeIntegration: true,
 contextIsolation: false,
 此方案也会报错'contextBridge API can only be used when contextIsolation is enabled'，但是程序能正常运行
+
+###改用 pinia 状态管理库后重构代码出现的问题
+bug8: 在非组件文件文件的顶部（全局）引入定义好的某个 store，会报该 store 未进行初始化的错误
+解决方案：要在使用到的具体函数里面引入某个 store,才可以成功访问到。
+
+bug9: pinia 在写异步请求的时候请求 1 需要请求 2 返回的某个数据作为请求参数，由于请求是异步的，无法确定保证请求
+2 的数据可以及时返回
+解决方案：用 async 和 await 的写法保证请求 2 的数据已经全部返回再进行后续操作，另外也可以将需要的数据写在
+Promise.resolve(需返回的数据)中返回回去，后续可用 then(fn(返回的数据))调用。如果只是正常的调用接口数据，
+建议不要在组件里面大量地写 async 和 await,会增加页面渲染时长
+
+bug10: 在 vuex 时，在调用接口的时候直接将字符串作为参数传进 axiois 请求参数里面，并不会报错，但是 pinia 会
+解决方案： 参数｛｝包裹之后变成对象之后再传进去，问题解决 tips: 有时候看报错也是一门学问呀，可以受到启发
