@@ -1,5 +1,3 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-
 import home from '@/views/home.vue'
 
 const routes = [
@@ -14,11 +12,11 @@ const routes = [
     name: 'library',
     component: async () => import('@/views/library.vue'),
   },
-  // {
-  //   path: '/library/like-songs',
-  //   name: 'likeSongs',
-  //   component: async () => import('@/views/playlist.vue'),
-  // },
+  {
+    path: '/library/like-songs',
+    name: 'likeSongs',
+    component: async () => import('@/views/playlist.vue'),
+  },
   {
     path: '/setting',
     name: 'setting',
@@ -42,7 +40,4 @@ const routes = [
   },
 ]
 
-export default createRouter({
-  routes,
-  history: createWebHashHistory(),
-})
+export default routes

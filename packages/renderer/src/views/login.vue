@@ -45,25 +45,18 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'LogIn',
-  components: {
-    Icon,
-  },
-  data () {
-    return {
-      cardIsActive: 0,
-    }
-  },
-  methods: {
-    goTo (path) {
-      this.$router.push({ path: '/login/' + path })
-    },
-  },
-})
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const cardIsActive = ref(0)
+
+const goTo = (path: string) => {
+  router.push({ path: '/login/' + path })
+}
 </script>
 
 <style lang="scss" scoped>

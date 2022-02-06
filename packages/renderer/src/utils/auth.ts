@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-import store from '../store'
+import { userDataStore } from '../store/userData'
 
 export function setCookie (key: string) {
   const cookies = key.split(';;')
@@ -26,5 +26,6 @@ export function isLogin () {
 }
 
 export function isAccountLogin () {
-  return getCookie('MUSIC_U') !== undefined && store.state.data.loginMode === 'account'
+  const store = userDataStore()
+  return getCookie('MUSIC_U') !== undefined && store.loginMode === 'account'
 }

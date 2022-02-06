@@ -1,11 +1,4 @@
 <template>
   <h1>{{ $t('home') }}</h1>
 </template>
-<script>
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'HomePage',
-  components: {},
-})
-</script>
+<script setup lang="ts"></script>

@@ -4,13 +4,8 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-export default defineComponent({
-  name: 'LoginUsername',
-  components: {},
-  data () {
-    return {}
-  },
-})
+<script setup lang="ts">
+import { ref } from 'vue'
+const number = ref(0)
+console.log(number.value)
 </script>

@@ -24,7 +24,7 @@ const rules = {
   'vue/html-self-closing': 'off',
   'vue/singleline-html-element-content-newline': 'off',
   'vue/multi-word-component-names': [
-    'error',
+    'off',
     {
       ignores: [],
     },

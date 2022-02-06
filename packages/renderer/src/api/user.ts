@@ -3,7 +3,7 @@ import request from '../utils/request'
 说明 : 登录后调用此接口 ,可获取用户账号信息
  */
 
-export const userAccount: () => Promise<any> = async () => {
+export const userAccount = async () => {
   return request({
     url: '/user/account',
     method: 'get',
@@ -20,16 +20,40 @@ export const userAccount: () => Promise<any> = async () => {
 limit : 返回数量 , 默认为 30
 offset : 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
  */
-interface UserPlaylist {
+interface UserPlaylistParams {
   uid: number
   limit?: number
   offset?: number
 }
-export const userPlaylist: (params: UserPlaylist) => Promise<any> = async (params) => {
+type UserPlayList = (params: UserPlaylistParams) => Promise<any>
+export const userPlaylist: UserPlayList = async (params: UserPlaylistParams) => {
   return request({
     url: '/user/playlist',
     method: 'get',
     params: params,
+  })
+}
+
+/**
+ * 获取用户播放记录
+ * 说明 : 登录后调用此接口 , 传入用户 id, 可获取用户播放记录
+ * - uid : 用户 id
+ * - type : type=1 时只返回 weekData, type=0 时返回 allData
+ * @param {Object} params
+ * @param {number} params.uid
+ * @param {number} params.type
+ */
+
+interface UserPlayHistoryParams {
+  uid: number
+  type: number
+}
+type UserPlayHistory = (params: UserPlayHistoryParams) => Promise<any>
+export const userPlayHistory: UserPlayHistory = async (params) => {
+  return request({
+    url: '/user/record',
+    method: 'get',
+    params,
   })
 }
 
@@ -42,7 +66,6 @@ interface LikedSongsIDs {
   uid: number
   timestamp?: number
 }
-
 type UserLikedSongsIDs = (params: LikedSongsIDs) => Promise<any>
 export const userLikedSongsIDs: UserLikedSongsIDs = async (params) => {
   return request({
@@ -113,4 +136,89 @@ export const likedMVs: LikedMVs = async (params) => {
       timestamp: Date.now(),
     },
   })
+}
+
+/**
+ * 上传歌曲到云盘（需要登录）
+ */
+export const uploadSong = async (file: string | Blob) => {
+  const formData = new FormData()
+  formData.append('songFile', file)
+  return request({
+    url: '/cloud',
+    method: 'post',
+    params: {
+      timestamp: Date.now(),
+    },
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    timeout: 200000,
+  }).catch((err) => {
+    alert(`上传失败，Error: ${err}`)
+  })
+}
+
+/**
+ * 获取云盘歌曲（需要登录）
+ * 说明 : 登录后调用此接口 , 可获取云盘数据 , 获取的数据没有对应 url, 需要再调用一 次 /song/url 获取 url
+ * - limit : 返回数量 , 默认为 200
+ * - offset : 偏移数量，用于分页 , 如 :( 页数 -1)*200, 其中 200 为 limit 的值 , 默认为 0
+ */
+
+interface CloudDiskParams {
+  limit: number
+  offset?: number
+  timestamp?: number
+}
+type CloudDisk = (params: CloudDiskParams) => Promise<any>
+export const cloudDisk: CloudDisk = async (params) => {
+  params.timestamp = Date.now()
+  const res = await request({
+    url: '/user/cloud',
+    method: 'get',
+    params,
+  })
+  return res
+}
+
+/**
+ * 获取云盘歌曲详情（需要登录）
+ */
+interface CloudTrackDetailParams {
+  id: number
+  timestamp?: number
+}
+type CloudDiskTrackDetail = (params: CloudTrackDetailParams) => Promise<any>
+export const cloudDiskTrackDetail: CloudDiskTrackDetail = async (params) => {
+  const res = await request({
+    url: '/user/cloud/detail',
+    method: 'get',
+    params: {
+      timestamp: Date.now(),
+      id: params.id,
+    },
+  })
+  return res
+}
+
+/**
+ * 删除云盘歌曲（需要登录）
+ */
+interface CloudTrackDeleteParams {
+  id: number[]
+  timestamp?: number
+}
+type CloudTrackDelete = (params: CloudTrackDeleteParams) => Promise<any>
+export const cloudDiskTrackDelete: CloudTrackDelete = async (params) => {
+  const res = await request({
+    url: '/user/cloud/del',
+    method: 'get',
+    params: {
+      timestamp: Date.now(),
+      id: params.id,
+    },
+  })
+  return res
 }

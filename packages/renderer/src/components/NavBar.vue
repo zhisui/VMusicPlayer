@@ -5,7 +5,7 @@
       <IconButton @click="go('back')">
         <Icon icon="dashicons:arrow-left-alt2" width="26" class="icon" />
       </IconButton>
-      <IconButton @click="go(forward)">
+      <IconButton @click="go('forward')">
         <Icon icon="dashicons:arrow-right-alt2" width="26" class="icon" />
       </IconButton>
     </div>
@@ -63,19 +63,19 @@ import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useStore } from '../store/index.ts'
 import DropdownMenu from './DropdownMenu.vue'
 import IconButton from './IconButton.vue'
+
+import { userDataStore } from '@/store/userData'
 
 const inputFocus = ref(false)
 const showMenu = ref(false)
 const keywords = ref('')
-/* eslint-disable new-cap */
-const store = new useStore()
-const state = store.state
+
+const store = userDataStore()
 const router = useRouter()
 
-const go = (where) => {
+const go = (where: 'back' | 'forward') => {
   if (where === 'back') {
     router.go(-1)
   } else {
@@ -100,8 +100,8 @@ const toGithub = () => {
 }
 
 const avatarUrl = computed(() => {
-  return state.data?.user?.avatarUrl
-    ? `${state.data?.user?.avatarUrl}?param=512y512`
+  return store.user?.avatarUrl
+    ? `${store.user?.avatarUrl}?param=512y512`
     : 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60'
 })
 </script>
