@@ -14,6 +14,9 @@
 
 <script setup lang="ts">
 import NavBar from '@/components/NavBar.vue'
+
+// eslint-disable-next-line no-undef
+// const isElectron = ref(process.env.IS_ELECTRON)
 </script>
 
 <style lang="scss" scoped>

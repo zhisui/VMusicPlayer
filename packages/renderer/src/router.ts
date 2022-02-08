@@ -38,6 +38,11 @@ const routes = [
     name: 'loginUsername',
     component: async () => import('@/views/loginUsername.vue'),
   },
+  {
+    path: '/album/:id',
+    name: 'album',
+    component: async () => import('@/views/album.vue'),
+  },
 ]
 
 export default routes
