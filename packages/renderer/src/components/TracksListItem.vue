@@ -111,12 +111,12 @@ interface Props {
   trackProp: TrackProp
   isHighlightPlayingTrack: boolean
   itemType: string
-  playThisList?: any
-  likeATrack?: any
-  likedSongs?: number[]
+  likedSongs: number[]
   rightClickedTrack?: any
 }
 
+// eslint-disable-next-line no-undef
+const emits = defineEmits(['playThisList', 'likeATrack'])
 // eslint-disable-next-line no-undef
 const props = withDefaults(defineProps<Props>(), {
   isHighlightPlayingTrack: true,
@@ -176,10 +176,10 @@ const goToAlbumDetail = () => {
 
 const showOrderNumber = isAlbum.value
 const playTrack = () => {
-  props.playThisList(track.value.id)
+  emits('playThisList', track.value.id)
 }
 const likeThisSong = () => {
-  props.likeATrack(track.value.id)
+  emits('likeATrack', track.value.id)
 }
 
 const isSubTitle = computed(() => {

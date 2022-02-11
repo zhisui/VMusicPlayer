@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 <template>
   <div class="track-list">
     <!--展示歌曲列表-->
@@ -8,15 +7,24 @@
         :key="itemkey === 'id' ? track.id : `${track.id}${index}`"
         :track-props="track"
         :is-highlight-playing-track="isHighlightPlayingTrack"
+        :class="`item-${index}`"
+        @play-this-list="playThisList"
         @dblclick="playThisList(track.id || track.songId)"
+        @click.right="openMenu($event, track, index)"
       />
+
+      <ContexMenu ref="menu">
+        <div></div>
+        <ContexMenu />
+      </ContexMenu>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { defineProps, reactive, ref, withDefaults } from 'vue'
 
-import { playerStore } from '../store/playerStore'
+import player from '../utils/Player'
+import ContexMenu from './ContexMenu.vue'
 
 import TrackListItem from '@/components/TrackListItem.vue'
 
@@ -29,7 +37,7 @@ const rightClickedTrack = reactive({
 // eslint-disable-next-line no-unused-vars
 const rightClickedTrackIndex = ref(-1)
 const listStyle = ref({})
-const playerState = playerStore()
+const menu = ref()
 
 interface AlbumObject {
   artist: {
@@ -48,7 +56,7 @@ interface Props {
   isHighlightPlayingTrack: boolean
   itemkey: string
 }
-// eslint-disable-next-line no-undef
+
 const props = withDefaults(defineProps<Props>(), {
   itemType: 'trackList',
   dbclickTrackFunc: 'default',
@@ -58,21 +66,64 @@ const props = withDefaults(defineProps<Props>(), {
   itemkey: 'id',
 })
 
-// eslint-disable-next-line no-unused-vars
-const playThisListDefault = (trackId: number) => {
+const playThisListDefault = (trackID: number) => {
   switch (props.itemType) {
     case 'playlist':
-      console.log(playerState)
-      console.log(rightClickedTrack)
-
-    // 待写
-    // playerState.playPlayListByID(props.id, trackId)
+      player.playPlaylistByID(props.id, trackID)
+      break
+    case 'album':
+      player.playAlbumByID(props.id, trackID)
+      break
+    case 'tracklist':
+      // eslint-disable-next-line no-case-declarations
+      const trackIDs = props.tracks.map((t) => t.id)
+      player.replacePlaylist(trackIDs, props.id, 'artist', trackID)
+      break
   }
 }
 const playThisList = (trackID: number) => {
-  switch (props.doubleClickTrackFunc) {
-    case 'default':
-    //  待写
+  switch (props.dbclickTrackFunc) {
+    case 'default': {
+      playThisListDefault(trackID)
+      break
+    }
+    case 'none': {
+      // do nothing
+      break
+    }
+    case 'playTrackOnListByID': {
+      player.playTrackOnListByID(trackID)
+      break
+    }
+    case 'playPlaylistByID': {
+      player.playPlaylistByID(props.id, trackID)
+      break
+    }
+    case 'playAList': {
+      const trackIDs = props.tracks.map((t) => t.id || t.songId)
+      player.replacePlaylist(trackIDs, props.id, 'artist', trackID)
+      break
+    }
+    case 'dailyTracks': {
+      const trackIDs = props.tracks.map((t) => t.id)
+      player.replacePlaylist(trackIDs, props.id, 'url', trackID)
+      break
+    }
+    case 'playCloudDisk': {
+      const trackIDs = props.tracks.map((t) => t.id || t.songId)
+      player.replacePlaylist(trackIDs, props.id, 'cloudDisk', trackID)
+      break
+    }
+    // No default
   }
+}
+
+const openMenu = (e: any, track: any, index = -1) => {
+  rightClickedTrack.id = track.id
+  rightClickedTrack.name = track.name
+  rightClickedTrack.name = track.ar
+  rightClickedTrack.al = track.al
+  rightClickedTrackIndex.value = -1
+  menu.value.openMenue(e)
 }
 </script>

@@ -26,7 +26,7 @@ export const userDataStore = defineStore('userData', {
     loginMode: '',
     liked: {
       playlists: [],
-      songs: [],
+      songs: [0],
       songsWithDetails: [],
       playHistory: {},
       artists: [],

@@ -1,16 +1,4 @@
-import { Howl, Howler } from 'howler'
 import { defineStore } from 'pinia'
-
-const electron = window.require('electron')
-const ipcRender = electron.ipcRender
-const delay = (ms: number) => {
-  // eslint-disable-next-line no-new
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('')
-    }, ms)
-  })
-}
 
 export const playerStore = defineStore('player', {
   // arrow function recommended for full type inference
@@ -33,11 +21,12 @@ export const playerStore = defineStore('player', {
       shuffledList: [], // 被随机打乱的播放列表，随机播放模式下会使用此播放列表
       shuffledCurrent: 0, // 当前播放歌曲在随机列表里面的index
       playlistSource: { type: 'album', id: 123 }, // 当前播放列表的信息
-      currentTrack: { id: 86827685 }, // 当前播放歌曲的详细信息
+      currentTrack: { id: 86827685, dt: 0, name: '' }, // 当前播放歌曲的详细信息
       playNextList: [], // 当这个list不为空时，会优先播放这个list的歌
       isPersonalFM: false, // 是否是私人FM模式
       personalFMTrack: { id: 0 }, // 私人FM当前歌曲
       personalFMNextTrack: { id: 0 }, // 私人FM下一首歌曲信息（为了快速加载下一首）
+      createdBlobRecords: [],
     }
   },
 })

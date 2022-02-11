@@ -2,11 +2,6 @@ import Dexie, { Table } from 'dexie'
 
 import { getTrackDetail } from '@/api/track'
 
-export interface Common {
-  id?: number
-  updateTime: number
-}
-
 export interface TrackDetail {
   id: number
   detail: any
@@ -20,11 +15,17 @@ export interface Lyric {
   updateTime: number
 }
 
+export interface Album {
+  id: number
+  album: any
+  updateTime: number
+}
+
 export class VmPlayerMusic extends Dexie {
   trackDetail!: Table<TrackDetail>
   lyric!: Table<Lyric>
-  album!: Table<Common>
-  trackSources!: Table<Common>
+  album!: Table<Album>
+  trackSources!: Table<Album>
 
   constructor () {
     super('vmPlayerMusic')
@@ -93,6 +94,21 @@ export class VmPlayerMusic extends Dexie {
     return db.lyric.get(Number(id)).then((res) => {
       if (!res) return undefined
       return res.lyrics
+    })
+  }
+
+  cacheAlbum (id: number, album: any) {
+    db.album.put({
+      id: Number(id),
+      album,
+      updateTime: Date.now(),
+    })
+  }
+
+  async getAlbumFromCache (id: number) {
+    return db.album.get(Number(id)).then((res) => {
+      if (!res) return undefined
+      return res.album
     })
   }
 }
