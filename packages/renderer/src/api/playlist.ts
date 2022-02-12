@@ -27,3 +27,28 @@ export const getPlaylistDetail: GetPlaylistDetail = async (params) => {
     },
   })
 }
+
+/**
+ * 对歌单添加或删除歌曲
+ * 说明 : 调用此接口 , 可以添加歌曲到歌单或者从歌单删除某首歌曲 ( 需要登录 )
+ * - op: 从歌单增加单曲为 add, 删除为 del
+ * - pid: 歌单 id tracks: 歌曲 id,可多个,用逗号隔开
+ */
+interface AddOrRemoveTrackFromPlaylistParams {
+  pid: string
+  op: string
+  timestamp?: number
+}
+type AddOrRemoveTrackFromPlaylist = (
+  params: AddOrRemoveTrackFromPlaylistParams
+) => Promise<any>
+export const addOrRemoveTrackFromPlaylist: AddOrRemoveTrackFromPlaylist = async (
+  params
+) => {
+  params.timestamp = Date.now()
+  return request({
+    url: '/playlist/tracks',
+    method: 'post',
+    params,
+  })
+}

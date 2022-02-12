@@ -64,6 +64,7 @@ onMounted(async () => {
   store.fetchLikedMVs()
   store.fetchCloudDisk()
   store.fetchPlayHistory()
+  store.fetchLikedAlbums()
   await store.fetchLikedSongsIDs()
   getRandomLyric()
   NProgress.done()

@@ -1,3 +1,4 @@
+import { settingStore } from '../store/settingStore'
 import { mapTrackPlayableStatus } from '../utils/common'
 import { db } from '../utils/db'
 
@@ -62,9 +63,59 @@ export const getLyric = async (id: number) => {
       return res
     })
   }
-
   fetchLatest()
   return db.getLyricFromCache(id).then((result) => {
     return result ?? fetchLatest()
+  })
+}
+
+/**
+ * 获取音乐 url
+ * 说明 : 使用歌单详情接口后 , 能得到的音乐的 id, 但不能得到的音乐 url, 调用此接口, 传入的音乐 id( 可多个 , 用逗号隔开 ), 可以获取对应的音乐的 url,
+ * !!!未登录状态返回试听片段(返回字段包含被截取的正常歌曲的开始时间和结束时间)
+ * @param {string} id - 音乐的 id，例如 id=405998841,33894312
+ */
+interface GetMP3Params {
+  id: number
+  br?: number
+}
+type GetMP3 = (params: GetMP3Params) => Promise<any>
+export const getMP3: GetMP3 = (params) => {
+  const store = settingStore()
+  const br = store?.musicQuality !== undefined ? store.musicQuality : 320000
+  return request({
+    url: '/song/url',
+    method: 'get',
+    params: {
+      id: params.id,
+      br: params.br,
+    },
+  })
+}
+
+/**
+ * 听歌打卡
+ * 说明 : 调用此接口 , 传入音乐 id, 来源 id，歌曲时间 time，更新听歌排行数据
+ * - id - 歌曲 id
+ * - sourceid - 歌单或专辑 id
+ * - time - 歌曲播放时间,单位为秒
+ * @param {Object} params
+ * @param {number} params.id
+ * @param {number} params.sourceid
+ * @param {number=} params.time
+ */
+interface ScrobbleParams {
+  id: number
+  sourceid: number
+  time: number
+  timestamp?: number
+}
+type Scrobble = (params: ScrobbleParams) => Promise<any>
+export const scrobble: Scrobble = (params) => {
+  params.timestamp = Date.now()
+  return request({
+    url: '/scrobble',
+    method: 'get',
+    params,
   })
 }
