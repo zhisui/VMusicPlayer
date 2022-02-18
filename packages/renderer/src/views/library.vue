@@ -47,7 +47,7 @@ import NProgress from 'nprogress'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getLyric } from '@/api/track'
+import { getLyric, getMP3 } from '@/api/track'
 import { userDataStore } from '@/store/userData'
 import { randomNum } from '@/utils/common'
 
@@ -98,12 +98,20 @@ const getRandomLyric = async () => {
     if (res.lrc !== undefined) {
       const isInstrumental = res.lrc.lyric
         .split('\n')
-        .filter((l: string) => l.includes('纯音乐，请欣赏'))
+        .filter((l: string) => l.includes('做词'))
       lyric.value =
-        isInstrumental.length === 0 ? res.lrc.lyric : '此曲只应天上有，人间能得几回闻'
+        isInstrumental.length === 0
+          ? res.lrc.lyric
+          : '[00:40.52]刻骨的变迁不是遥远\n[00:46.94]再有一万年深情也不变\n[00:54.36]爱像烈火般蔓延\n'
     }
   })
 }
+const getMusic = () => {
+  getMP3({ id: 559227860 }).then((result) => {
+    console.log(result)
+  })
+}
+getMusic()
 
 // 路由部分
 const tolikeSongsList = () => {

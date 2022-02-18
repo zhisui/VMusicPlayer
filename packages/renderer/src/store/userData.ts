@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 
-import { getCookie } from '../utils/auth'
+import { isAccountLogin } from '../utils/auth'
+import { toastStore } from './toastStore'
 
 import { getPlaylistDetail } from '@/api/playlist'
-import { getTrackDetail } from '@/api/track'
+import { getTrackDetail, likeATrack } from '@/api/track'
 import {
   cloudDisk,
   likedAlbums,
@@ -126,10 +127,30 @@ export const userDataStore = defineStore('userData', {
         this.liked.cloudDisk = result.data
       })
     },
+
+    // 将歌曲加入喜欢队列或者移除喜欢队列
+    loveATrck (id: number) {
+      const storeToast = toastStore()
+      if (!isAccountLogin()) {
+        storeToast.showToast('此操作需要登录网易云账号')
+        return
+      }
+      let like = true
+      if (this.liked.songs.includes(id)) like = false
+      likeATrack({ id, like })
+        .then(() => {
+          if (!like) {
+            this.liked.songs = this.liked.songs.filter((d) => d !== id)
+          } else {
+            const newLikeSongs = this.liked.songs
+            newLikeSongs.push(id)
+            this.liked.songs = newLikeSongs
+          }
+          this.fetchLikedSongsWithDetails()
+        })
+        .catch(() => {
+          storeToast.showToast('操作失败，专辑下架或版权锁定')
+        })
+    },
   },
 })
-
-export function isAccountLogin () {
-  const store = userDataStore()
-  return getCookie('MUSIC_U') !== undefined && store.loginMode === 'account'
-}

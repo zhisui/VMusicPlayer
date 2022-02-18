@@ -12,17 +12,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-type Artists = [{
-name: string
-id: number
-}]
+import { computed, defineProps,withDefaults } from 'vue'
+type Artists = [{name: string, id: number}]
 interface Props {
   artists: Artists
   exclude?: string
   prefix?: string
 }
-// eslint-disable-next-line no-undef
 const props = withDefaults(defineProps<Props>(), {
   exclude: '',
   prefix: '',

@@ -37,6 +37,7 @@ export const getPlaylistDetail: GetPlaylistDetail = async (params) => {
 interface AddOrRemoveTrackFromPlaylistParams {
   pid: string
   op: string
+  tracks: string
   timestamp?: number
 }
 type AddOrRemoveTrackFromPlaylist = (

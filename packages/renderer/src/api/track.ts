@@ -88,7 +88,7 @@ export const getMP3: GetMP3 = (params) => {
     method: 'get',
     params: {
       id: params.id,
-      br: params.br,
+      br: br,
     },
   })
 }
@@ -115,6 +115,31 @@ export const scrobble: Scrobble = (params) => {
   params.timestamp = Date.now()
   return request({
     url: '/scrobble',
+    method: 'get',
+    params,
+  })
+}
+
+/**
+ * 喜欢音乐
+ * 说明 : 调用此接口 , 传入音乐 id, 可喜欢该音乐
+ * - id - 歌曲 id
+ * - like - 默认为 true 即喜欢 , 若传 false, 则取消喜欢
+ * @param {Object} params
+ * @param {number} params.id
+ * @param {boolean=} [params.like]
+ */
+
+interface LikeATrackParams {
+  id: number
+  like: boolean
+  timestamp?: number
+}
+type LikeATrack = (params: LikeATrackParams) => Promise<any>
+export const likeATrack: LikeATrack = (params) => {
+  params.timestamp = Date.now()
+  return request({
+    url: '/like',
     method: 'get',
     params,
   })

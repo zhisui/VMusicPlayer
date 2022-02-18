@@ -14,27 +14,91 @@
       />
 
       <ContexMenu ref="menu">
-        <div></div>
-        <ContexMenu />
+        <!-- 展示歌曲名，封面、歌手 -->
+        <div v-show="itemType !== 'cloundDisk'" class="item-info">
+          <img :src="rightClickedTrackComputed.al.picUrl" />
+          <div class="info">
+            <h3 class="title">{{ rightClickedTrackComputed.name }}</h3>
+            <p class="subtitle">{{ rightClickedTrackComputed.ar[0].name }}</p>
+          </div>
+        </div>
+        <hr />
+
+        <div class="item" @click="play">播放</div>
+
+        <div class="item" @click="addToQueue">
+          添加到队列
+        </div>
+
+        <div v-show="itemType !== 'cloudDisk'" class="item" @click="addTrackToPlaylist">
+          添加到歌单
+        </div>
+
+        <div
+          v-show="!isRightClickedTrackLiked && itemType !== 'cloudDisk'"
+          class="item"
+          @click="like"
+        >
+          添加到我喜欢的音乐
+        </div>
+
+        <div
+          v-show="isRightClickedTrackLiked && itemType !== 'cloudDisk'"
+          class="item"
+          @click="like"
+        >
+          从喜欢的音乐中删除
+        </div>
+
+        <div
+          v-if="extraContextMenuItem.includes('removeTrackFromQueue')"
+          class="item"
+          @click="removeTrackFromQueue"
+        >
+          从队列中删除
+        </div>
+        <!-- 从歌单中删除只有在音乐库的歌单Item里面才会出现 -->
+        <div
+          v-if="extraContextMenuItem.includes('removeTrackFromPlaylist')"
+          class="item"
+          @click="removeTrackFromPlaylist"
+        >
+          从歌单中删除
+        </div>
+
+        <div
+          v-if="extraContextMenuItem.includes('removeTrackFromCloudDisk')"
+          class="item"
+          @click="removeTrackFromCloudDisk"
+        >
+          从云盘中删除
+        </div>
       </ContexMenu>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { defineProps, reactive, ref, withDefaults } from 'vue'
+import { computed, defineEmits, defineProps, reactive, ref, withDefaults } from 'vue'
 
+import { addOrRemoveTrackFromPlaylist } from '../api/playlist'
+import { cloudDiskTrackDelete } from '../api/user'
+import { modalsStore } from '../store/modalsStore'
+import { toastStore } from '../store/toastStore'
+import { userDataStore } from '../store/userData'
 import player from '../utils/Player'
 import ContexMenu from './ContexMenu.vue'
 
 import TrackListItem from '@/components/TrackListItem.vue'
-
+import { isAccountLogin } from '@/utils/auth'
+const storeToast = toastStore()
+const storeModals = modalsStore()
+const storeUser = userDataStore()
 const rightClickedTrack = reactive({
   id: 0,
   name: '',
   ar: [{ name: '' }],
   al: { picUrl: '' },
 })
-// eslint-disable-next-line no-unused-vars
 const rightClickedTrackIndex = ref(-1)
 const listStyle = ref({})
 const menu = ref()
@@ -55,6 +119,8 @@ interface Props {
   columnNumber: number
   isHighlightPlayingTrack: boolean
   itemkey: string
+  // extraContextMenuItem的可能值'removeTrackFromPlaylist' 'removeTrackFromQueue' 'removeTrackFromCloudDisk'
+  extraContextMenuItem: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -66,6 +132,24 @@ const props = withDefaults(defineProps<Props>(), {
   itemkey: 'id',
 })
 
+const emits = defineEmits(['removeTrack'])
+
+// 判断当前歌曲是否是喜欢列表中的歌曲
+const isRightClickedTrackLiked = computed(() => {
+  const store = userDataStore()
+  return store.liked.songs.includes(rightClickedTrack?.id)
+})
+
+const rightClickedTrackComputed = computed(() => {
+  return props.itemType === 'cloudDisk'
+    ? {
+      id: 0,
+      name: '',
+      ar: [{ name: '' }],
+      al: { picUrl: '' },
+    }
+    : rightClickedTrack
+})
 const playThisListDefault = (trackID: number) => {
   switch (props.itemType) {
     case 'playlist':
@@ -74,11 +158,11 @@ const playThisListDefault = (trackID: number) => {
     case 'album':
       player.playAlbumByID(props.id, trackID)
       break
-    case 'tracklist':
-      // eslint-disable-next-line no-case-declarations
+    case 'tracklist': {
       const trackIDs = props.tracks.map((t) => t.id)
       player.replacePlaylist(trackIDs, props.id, 'artist', trackID)
       break
+    }
   }
 }
 const playThisList = (trackID: number) => {
@@ -114,16 +198,71 @@ const playThisList = (trackID: number) => {
       player.replacePlaylist(trackIDs, props.id, 'cloudDisk', trackID)
       break
     }
-    // No default
   }
 }
 
 const openMenu = (e: any, track: any, index = -1) => {
   rightClickedTrack.id = track.id
   rightClickedTrack.name = track.name
-  rightClickedTrack.name = track.ar
+  rightClickedTrack.ar = track.ar
   rightClickedTrack.al = track.al
-  rightClickedTrackIndex.value = -1
+  rightClickedTrackIndex.value = index
   menu.value.openMenue(e)
+}
+
+const play = () => {
+  player.addTrackToPlayNext(rightClickedTrack.id, true)
+}
+// 将歌曲添加到队列中实现在现有歌单中插队播放 ，在播放列表开启的模式下可用
+const addToQueue = () => {
+  player.addTrackToPlayNext(rightClickedTrack.id)
+}
+
+const addTrackToPlaylist = () => {
+  if (!isAccountLogin()) {
+    storeToast.showToast('此操作需要登录网易云账户')
+  }
+  storeModals.addTrackToPlaylistModal.show = true
+  storeModals.addTrackToPlaylistModal.selectedTrackID = rightClickedTrack.id
+}
+
+const removeTrackFromPlaylist = () => {
+  if (!isAccountLogin()) {
+    storeToast.showToast('此操作需要登录网易云账户')
+    return
+  }
+  // eslint-disable-next-line no-restricted-globals
+  if (confirm(`确定要从歌单删除 ${rightClickedTrack.name}？`)) {
+    const trackID = rightClickedTrack.id.toString()
+    addOrRemoveTrackFromPlaylist({
+      op: 'del',
+      pid: props.id.toString(),
+      tracks: trackID,
+    }).then((data) => {
+      storeToast.showToast(data.body.code === 200 ? '已从歌单中删除' : data.body.message)
+      emits('removeTrack', trackID)
+    })
+  }
+}
+
+const removeTrackFromQueue = () => {
+  player.removeTrackFromQueue(rightClickedTrackIndex.value)
+}
+
+const removeTrackFromCloudDisk = () => {
+  // 注意调用接口返回的云盘信息在simpleSongs字段里面
+  // eslint-disable-next-line no-restricted-globals
+  if (confirm(`确定要从云盘删除 ${rightClickedTrack.name}？`)) {
+    const trackID = rightClickedTrack.id.toString()
+    cloudDiskTrackDelete({ id: trackID }).then((data) => {
+      storeToast.showToast(data.code === 200 ? '已将此歌曲从云盘删除' : data.message)
+      const newCloudDisk = storeUser.liked.cloudDisk.filter((t: any) => t.id !== trackID)
+      storeUser.liked.cloudDisk = newCloudDisk
+    })
+  }
+}
+
+const like = () => {
+  storeUser.loveATrck(rightClickedTrack.id)
 }
 </script>
