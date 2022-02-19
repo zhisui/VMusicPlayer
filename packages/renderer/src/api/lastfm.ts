@@ -9,7 +9,7 @@ const baseUrl = window.location.origin
 const url = 'https://ws.audioscrobbler.com/2.0/'
 
 // 生成签名
-const sign = (params: { [x: string]: any }) => {
+const sign = (params: Record<string, any>) => {
   // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
   const sortParamsKeys = Object.keys(params).sort()
   const sortedParams = sortParamsKeys.reduce((acc, key) => {
@@ -24,6 +24,26 @@ const sign = (params: { [x: string]: any }) => {
   return md5(signature + apiSharedSecret).toString()
 }
 
+// https://www.last.fm/api/show/track.updateNowPlaying 告诉lastfm开始播放音乐了
+export async function trackUpdateNowPlaying (params: any) {
+  params.api_key = apiKey
+  params.method = 'track.updateNowPlaying'
+  // sk为通过身份验证协议对用户进行身份验证而生成的会话密钥
+  params.sk = JSON.parse(localStorage.getItem('lastfm')).key
+  const signature = sign(params)
+
+  return axios({
+    url,
+    method: 'POST',
+    params: {
+      ...params,
+      api_sig: signature,
+      format: 'json',
+    },
+  })
+}
+
+/** 猜测是获取同一歌手相关的歌曲 @see https://www.last.fm/api/show/track.scrobble */
 export const trackScrobble = async (params: { [x: string]: any }) => {
   params.api_key = apiKey
   params.method = 'track.scrobble'

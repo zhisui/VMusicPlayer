@@ -36,5 +36,6 @@ export const settingStore = defineStore('setting', {
       port: null,
     },
     shortcuts: shortcuts,
+    unmSource: '',
   }),
 })

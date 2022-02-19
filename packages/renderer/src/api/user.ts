@@ -187,7 +187,7 @@ export const cloudDisk: CloudDisk = async (params) => {
  * 获取云盘歌曲详情（需要登录）
  */
 interface CloudTrackDetailParams {
-  id: number
+  id: string
   timestamp?: number
 }
 type CloudDiskTrackDetail = (params: CloudTrackDetailParams) => Promise<any>
@@ -207,7 +207,7 @@ export const cloudDiskTrackDetail: CloudDiskTrackDetail = async (params) => {
  * 删除云盘歌曲（需要登录）
  */
 interface CloudTrackDeleteParams {
-  id: number[]
+  id: string
   timestamp?: number
 }
 type CloudTrackDelete = (params: CloudTrackDeleteParams) => Promise<any>

@@ -1,7 +1,9 @@
+import axios from 'axios'
 import Dexie, { Table } from 'dexie'
 
-import { getTrackDetail } from '@/api/track'
+import { settingStore } from '../store/settingStore'
 
+import { getTrackDetail } from '@/api/track'
 export interface TrackDetail {
   id: number
   detail: any
@@ -21,11 +23,24 @@ export interface Album {
   updateTime: number
 }
 
+export interface TrackSources {
+  id: number
+  source: any
+  name: string
+  bitRate: any
+  from: any
+  artist: any
+  createTime: number
+}
+
+/**
+@see https://dexie.org/docs/Tutorial/Getting-started
+*/
 export class VmPlayerMusic extends Dexie {
   trackDetail!: Table<TrackDetail>
   lyric!: Table<Lyric>
   album!: Table<Album>
-  trackSources!: Table<Album>
+  trackSources!: Table<TrackSources>
 
   constructor () {
     super('vmPlayerMusic')
@@ -47,6 +62,87 @@ export class VmPlayerMusic extends Dexie {
       )
   }
 
+  async deleteExcessCache (tracksCacheBytes: number) {
+    const store = settingStore()
+    if (
+      store.cacheLimit === false ||
+      tracksCacheBytes < store.cacheLimit * Math.pow(1024, 2)
+    ) {
+      return
+    }
+    try {
+      const delCache = await db.trackSources.orderBy('createTime').first()
+      if (delCache) {
+        await db.trackSources.delete(delCache.id)
+        tracksCacheBytes -= delCache.source.byteLength
+        console.debug(
+          `[debug][db.js] deleteExcessCacheSucces, track: ${delCache.name}, size: ${delCache.source.byteLength}, cacheSize:${tracksCacheBytes}`
+        )
+        this.deleteExcessCache(tracksCacheBytes)
+      }
+    } catch (err) {
+      console.debug('[debug][db.js] deleteExcessCacheFailed', err)
+    }
+  }
+
+  cacheTrackSource (
+    trackInfo: {
+      name: any
+      ar: { name: any }[]
+      artists: { name: any }[]
+      al: { picUrl: any }
+      id: number
+    },
+    // url为歌曲的在线播放地址
+    url: string,
+    bitRate: number,
+    from = 'netease'
+  ) {
+    let tracksCacheBytes = 0
+    if (!process.env.IS_ELECTRON) return
+    const name = trackInfo.name
+    const artist =
+      (trackInfo.ar && trackInfo.ar[0]?.name) ||
+      (trackInfo.artists && trackInfo.artists[0]?.name) ||
+      'Unknown'
+    let cover = trackInfo.al.picUrl
+    if (cover.slice(0, 5) !== 'https') {
+      cover = 'https' + String(cover.slice(4))
+    }
+    axios.get(`${cover}?param=512y512`)
+    axios.get(`${cover}?param=224y224`)
+    axios.get(`${cover}?param=1024y1024`)
+    return axios
+      .get(url, {
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        db.trackSources.put({
+          id: trackInfo.id,
+          source: response.data,
+          bitRate,
+          from,
+          name,
+          artist,
+          createTime: Date.now(),
+        })
+        console.debug(`[debug][db.js] cached track 👉 ${name} by ${artist}`)
+        tracksCacheBytes += response.data.byteLength
+        this.deleteExcessCache(tracksCacheBytes)
+        return { trackID: trackInfo.id, source: response.data, bitRate }
+      })
+  }
+
+  async getTrackSource (id: number) {
+    return db.trackSources.get(Number(id)).then((track) => {
+      if (!track) return null
+      console.debug(
+        `[debug][db.js] get track from cache 👉 ${track.name} by ${track.artist}`
+      )
+      return track
+    })
+  }
+
   cacheTrackDetail (track: any, privileges: any[]) {
     db.trackDetail.put({
       id: track.id,
@@ -56,7 +152,7 @@ export class VmPlayerMusic extends Dexie {
     })
   }
 
-  // 传入所有歌曲的trackid，然后从数据库中删选出所有符书的detail和privileges
+  // 传入所有歌曲的trackid，然后从数据库中删选出所有符合的detail和privileges
   async getTrackDetailFromCache (ids: string[]) {
     return db.trackDetail
       .filter((track) => {
@@ -81,7 +177,6 @@ export class VmPlayerMusic extends Dexie {
       })
   }
 
-  // 歌词存取
   cacheLyric (id: number, lyrics: any) {
     db.lyric.put({
       id,
@@ -91,9 +186,9 @@ export class VmPlayerMusic extends Dexie {
   }
 
   async getLyricFromCache (id: number) {
-    return db.lyric.get(Number(id)).then((res) => {
-      if (!res) return undefined
-      return res.lyrics
+    return db.lyric.get(Number(id)).then((result) => {
+      if (!result) return undefined
+      return result.lyrics
     })
   }
 
