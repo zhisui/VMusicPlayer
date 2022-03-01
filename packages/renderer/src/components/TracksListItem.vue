@@ -68,13 +68,18 @@
           }"
           class="icon"
         />
-        <Icon v-show="isLiked" icon="ci:heart-fill" color="red" class="icon" />
+        <Icon
+          v-show="isLiked"
+          icon="ci:heart-fill"
+          color="var(--primary-color)"
+          class="icon"
+        />
       </button>
     </div>
 
     <!-- 显示歌曲总时长 -->
     <div v-if="showTrackTime" class="time">
-      {{ track.dt }}
+      {{ trackTime() }}
     </div>
 
     <!-- 显示歌曲播放次数 -->
@@ -90,14 +95,19 @@ import { isNil } from 'lodash'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { userDataStore } from '../store/userData'
+import { formatTime } from '../utils/filters'
+
 import ArtistsInLine from '@/components/ArtistsInLine.vue'
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue'
 import { playerStore } from '@/store/playerStore'
 import { settingStore } from '@/store/settingStore'
+
 const hover = ref(false)
 const trackStyle = ref({})
 const settingState = settingStore()
 const playerState = playerStore()
+const userDataState = userDataStore()
 const router = useRouter()
 interface TrackProp {
   [x: string]: any
@@ -109,20 +119,23 @@ interface TrackProp {
 
 interface Props {
   trackProp: TrackProp
-  isHighlightPlayingTrack: boolean
+  isHighlightPlayingTrack?: boolean
   itemType: string
   likedSongs: number[]
-  rightClickedTrack?: any
+  rightClickedTrack: any
 }
 
 // eslint-disable-next-line no-undef
-const emits = defineEmits(['playThisList', 'likeATrack'])
+const emits = defineEmits(['playThisList', 'like'])
 // eslint-disable-next-line no-undef
 const props = withDefaults(defineProps<Props>(), {
   isHighlightPlayingTrack: true,
 })
 
 const track = computed(() => {
+  if (props.itemType === 'cloudDisk') {
+    return props.trackProp.simpleSong
+  }
   return props.trackProp
 })
 
@@ -179,7 +192,7 @@ const playTrack = () => {
   emits('playThisList', track.value.id)
 }
 const likeThisSong = () => {
-  emits('likeATrack', track.value.id)
+  userDataState.loveATrck(track.value.id)
 }
 
 const isSubTitle = computed(() => {
@@ -190,15 +203,15 @@ const isSubTitle = computed(() => {
 })
 
 const subTitle = computed(() => {
-  let tn = ''
+  let tn
   if (track.value?.tns?.length > 0 && track.value.name !== track.value.tns[0]) {
     tn = track.value.tns[0]
   }
   // 优先显示alia里面的内容
   if (settingState.subTitleDefault) {
-    return track.value?.alia?.length > 0 ? track.value.alia : tn
+    return track.value?.alia?.length > 0 ? track.value.alia[0].trim() : tn
   }
-  return tn === undefined ? track.value.alia[0] : tn
+  return tn === undefined ? track.value.alia[0].trim() : tn
 })
 
 const artists = computed(() => {
@@ -217,7 +230,7 @@ const showLikeButton = computed(() => {
 })
 
 const showTrackTime = computed(() => {
-  return props.itemType !== 'tracklists'
+  return props.itemType !== 'tracklist'
 })
 
 const album = computed(() => {
@@ -227,9 +240,13 @@ const album = computed(() => {
 const isLiked = computed(() => {
   return props.likedSongs?.includes(track.value.id)
 })
+
+const trackTime = () => {
+  return formatTime(track.value.dt)
+}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 button {
   display: flex;
   justify-content: center;
@@ -257,6 +274,10 @@ button {
   padding: 8px;
   border-radius: 12px;
   user-select: none;
+  &:hover {
+    background-color: var(--color-primary-bg-for-transparent);
+    color: var(--color-primary) !important;
+  }
 
   .no {
     display: flex;
@@ -310,7 +331,7 @@ button {
     .title {
       font-size: 18px;
       font-weight: 600;
-      color: var(--text-color);
+      /* color: var(--text-color); */
       cursor: default;
       padding-right: 16px;
       display: -webkit-box;
@@ -318,6 +339,7 @@ button {
       -webkit-line-clamp: 1;
       overflow: hidden;
       word-break: break-all;
+
       .featured {
         margin-right: 2px;
         font-weight: 500;
@@ -333,7 +355,7 @@ button {
       margin-top: 2px;
       font-size: 13px;
       opacity: 0.68;
-      color: var(--text-color);
+      /* color: var(--text-color); */
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 1;

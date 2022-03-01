@@ -96,9 +96,13 @@ import QRCode from 'qrcode'
 import { onBeforeUnmount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { LoginWithPhoneResponse } from '../api/types/auth'
+import { ErrorResponse } from '../api/types/error'
+
 import { checkQrCode, loginQrCodeKey, loginWithEmail, loginWithPhone } from '@/api/auth'
 import { userDataStore } from '@/store/userData'
 import { setCookie } from '@/utils/auth'
+import { notError } from '@/utils/common'
 
 const data = reactive({
   mode: 'qrCode',
@@ -185,20 +189,22 @@ const login = () => {
   }
 }
 
-const handleLoginResponse = (resData: any) => {
+const handleLoginResponse = (resData: LoginWithPhoneResponse | ErrorResponse) => {
   if (!resData) {
     data.processing = false
     return
   }
-  if (resData.code === 200) {
+
+  if (notError<LoginWithPhoneResponse>(resData)) {
     setCookie(resData.cookie)
     store.loginMode = 'account'
     store.user = resData.profile
+
     store.fetchLikedPlaylist()
     router.push({ name: 'library' })
   } else {
     data.processing = false
-    window.alert(resData.msg ?? resData.message ?? '账号或密码错误，请检查')
+    window.alert(resData.message ?? '账号或密码错误，请检查')
   }
 }
 
@@ -266,7 +272,7 @@ const checkQrCodeLogin = () => {
   }, 1000)
 }
 
-const changeMode = (mode) => {
+const changeMode = (mode: string) => {
   data.mode = mode
   if (mode === 'qrCode') {
     checkQrCodeLogin()

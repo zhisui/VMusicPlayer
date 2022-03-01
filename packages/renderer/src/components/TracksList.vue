@@ -2,21 +2,24 @@
   <div class="track-list">
     <!--展示歌曲列表-->
     <div :style="listStyle">
-      <TrackListItem
+      <TracksListItem
         v-for="(track, index) in tracks"
         :key="itemkey === 'id' ? track.id : `${track.id}${index}`"
-        :track-props="track"
-        :is-highlight-playing-track="isHighlightPlayingTrack"
+        :track-prop="track"
+        :is-highlight-playing-track="props.isHighlightPlayingTrack"
         :class="`item-${index}`"
+        :liked-songs="storeUser.liked.songs"
+        :right-clicked-track="rightClickedTrack"
+        :item-type="props.itemType"
         @play-this-list="playThisList"
         @dblclick="playThisList(track.id || track.songId)"
         @click.right="openMenu($event, track, index)"
       />
 
-      <ContexMenu ref="menu">
+      <ContextMenu ref="menu">
         <!-- 展示歌曲名，封面、歌手 -->
         <div v-show="itemType !== 'cloundDisk'" class="item-info">
-          <img :src="rightClickedTrackComputed.al.picUrl" />
+          <img :src="getImageUrl(224)" />
           <div class="info">
             <h3 class="title">{{ rightClickedTrackComputed.name }}</h3>
             <p class="subtitle">{{ rightClickedTrackComputed.ar[0].name }}</p>
@@ -51,7 +54,7 @@
         </div>
 
         <div
-          v-if="extraContextMenuItem.includes('removeTrackFromQueue')"
+          v-if="props.extraContextMenuItem.includes('removeTrackFromQueue')"
           class="item"
           @click="removeTrackFromQueue"
         >
@@ -59,7 +62,7 @@
         </div>
         <!-- 从歌单中删除只有在音乐库的歌单Item里面才会出现 -->
         <div
-          v-if="extraContextMenuItem.includes('removeTrackFromPlaylist')"
+          v-if="props.extraContextMenuItem.includes('removeTrackFromPlaylist')"
           class="item"
           @click="removeTrackFromPlaylist"
         >
@@ -67,13 +70,13 @@
         </div>
 
         <div
-          v-if="extraContextMenuItem.includes('removeTrackFromCloudDisk')"
+          v-if="props.extraContextMenuItem.includes('removeTrackFromCloudDisk')"
           class="item"
           @click="removeTrackFromCloudDisk"
         >
           从云盘中删除
         </div>
-      </ContexMenu>
+      </ContextMenu>
     </div>
   </div>
 </template>
@@ -85,10 +88,11 @@ import { cloudDiskTrackDelete } from '../api/user'
 import { modalsStore } from '../store/modalsStore'
 import { toastStore } from '../store/toastStore'
 import { userDataStore } from '../store/userData'
+import { resizeImage } from '../utils/filters'
 import player from '../utils/Player'
-import ContexMenu from './ContexMenu.vue'
 
-import TrackListItem from '@/components/TrackListItem.vue'
+import ContextMenu from '@/components/ContextMenu.vue'
+import TracksListItem from '@/components/TracksListItem.vue'
 import { isAccountLogin } from '@/utils/auth'
 const storeToast = toastStore()
 const storeModals = modalsStore()
@@ -112,13 +116,13 @@ interface AlbumObject {
 interface Props {
   tracks: any[]
   itemType: string
-  doubleClickTrackFunc: string
-  albumObject: AlbumObject
-  id: number
-  extraDropDownMenuItem: string[]
-  columnNumber: number
-  isHighlightPlayingTrack: boolean
-  itemkey: string
+  dbclickTrackFunc?: string
+  // eslint-disable-next-line vue/require-default-prop
+  albumObject?: AlbumObject
+  id?: number
+  columnNumber?: number
+  isHighlightPlayingTrack?: boolean
+  itemkey?: string
   // extraContextMenuItem的可能值'removeTrackFromPlaylist' 'removeTrackFromQueue' 'removeTrackFromCloudDisk'
   extraContextMenuItem: string[]
 }
@@ -126,11 +130,19 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   itemType: 'trackList',
   dbclickTrackFunc: 'default',
-  id: 0,
   columnNumber: 4,
   isHighlightPlayingTrack: true,
   itemkey: 'id',
+  id: 0,
 })
+
+if (props.itemType === 'tracklist') {
+  listStyle.value = {
+    display: 'grid',
+    gap: '4px',
+    gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
+  }
+}
 
 const emits = defineEmits(['removeTrack'])
 
@@ -201,13 +213,13 @@ const playThisList = (trackID: number) => {
   }
 }
 
-const openMenu = (e: any, track: any, index = -1) => {
+const openMenu = (e: MouseEvent, track: any, index = -1) => {
   rightClickedTrack.id = track.id
   rightClickedTrack.name = track.name
   rightClickedTrack.ar = track.ar
   rightClickedTrack.al = track.al
   rightClickedTrackIndex.value = index
-  menu.value.openMenue(e)
+  menu.value.openMenu(e)
 }
 
 const play = () => {
@@ -265,4 +277,23 @@ const removeTrackFromCloudDisk = () => {
 const like = () => {
   storeUser.loveATrck(rightClickedTrack.id)
 }
+
+const getImageUrl = (size: number) => {
+  const initialUrl = rightClickedTrackComputed.value.al.picUrl
+  return resizeImage(initialUrl, size)
+}
 </script>
+<style lang="scss" scoped>
+img {
+  border-radius: 8px;
+  height: 46px;
+  width: 46px;
+  margin-right: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+}
+
+img.hover {
+  filter: drop-shadow(100 200 0 black);
+}
+</style>

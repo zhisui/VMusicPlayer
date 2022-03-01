@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps,withDefaults } from 'vue'
-type Artists = [{name: string, id: number}]
+import { computed, defineProps, withDefaults } from 'vue'
+type Artists = { name: string; id: number }[]
 interface Props {
   artists: Artists
   exclude?: string
@@ -25,11 +25,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const filteredArtists = computed(() => {
-  return props.artists.filter((a) => a.name !== props.exclude)
+  return props.artists
+  // return props.artists.filter((a) => a.name !== props.exclude)
 })
 const computedPrefix = computed(() => {
   return filteredArtists.value.length !== 0 ? props.prefix : ''
 })
 </script>
 
-<style lang="ts" scoped></style>
+<style lang="ts"></style>
