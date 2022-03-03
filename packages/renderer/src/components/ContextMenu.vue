@@ -4,12 +4,12 @@
       v-if="showMenu"
       ref="menu"
       class="menu"
-      tabindex="-1"
-      :style="{ top: topLocation, left: leftLocation }"
+      tabindex="0"
+      :style="{ top: top + 'px', left: left + 'px' }"
       @blur="closeMenu"
       @click="closeMenu"
     >
-      <slot></slot>
+      <slot class="item"></slot>
     </div>
   </div>
 </template>
@@ -19,22 +19,22 @@ import { defineEmits, defineExpose, nextTick, ref } from 'vue'
 
 import { playerStore } from '../store/playerStore'
 const showMenu = ref(false)
-const topLocation = ref('0px')
-const leftLocation = ref('0px')
+const top = ref(0)
+const left = ref(0)
 const player = playerStore()
 const menu = ref()
 const emit = defineEmits<{
   (e: 'closeMenu'): void
 }>()
 
-const setMenu = (top: number, left: number) => {
+const setMenu = (y: number, x: number) => {
   const heightOffset = player.enabled ? 64 : 0
   const largestHeight = window.innerHeight - menu.value.offsetHeight - heightOffset
   const largestWidth = window.innerWidth - menu.value.offsetWidth - 25
-  if (top > largestHeight) top = largestHeight
-  if (left > largestWidth) left = largestWidth
-  topLocation.value = top + 'px'
-  leftLocation.value = left + 'px'
+  if (top.value > largestHeight) top.value = largestHeight
+  if (left.value > largestWidth) left.value = largestWidth
+  top.value = y
+  left.value = x
 }
 
 const closeMenu = () => {
@@ -44,20 +44,21 @@ const closeMenu = () => {
   }
 }
 
-const openMenu = (e: any) => {
+const openMenu = (e: MouseEvent) => {
   showMenu.value = true
-  nextTick(function () {
+  nextTick(() => {
     menu.value.focus()
     setMenu(e.y, e.x)
   })
   e.preventDefault()
 }
+
 defineExpose({
   openMenu,
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .context-menu {
   width: 100%;
   height: 100%;
@@ -70,7 +71,7 @@ defineExpose({
   max-width: 240px;
   list-style: none;
   background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 12px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);
   border-radius: 8px;
@@ -78,9 +79,25 @@ defineExpose({
   padding: 6px;
   z-index: 1000;
   -webkit-app-region: no-drag;
+  outline: none;
 
   &:focus {
     outline: none;
+  }
+
+  .item {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 7px;
+    cursor: default;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    &:hover {
+      color: var(--primary-color);
+      background: var(--dropdown-hover-color);
+    }
   }
 }
 
@@ -91,40 +108,19 @@ defineExpose({
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
   .menu .item:hover {
-    color: var(--color-text);
+    color: var(--text-color);
   }
 }
 
 @supports (-moz-appearance: none) {
   .menu {
-    background-color: var(--color-body-bg) !important;
-  }
-}
-
-.menu .item {
-  font-weight: 600;
-  font-size: 14px;
-  padding: 10px 14px;
-  border-radius: 7px;
-  cursor: default;
-  color: var(--color-text);
-  display: flex;
-  align-items: center;
-  &:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-bg-for-transparent);
-  }
-
-  .svg-icon {
-    height: 16px;
-    width: 16px;
-    margin-right: 5px;
+    background-color: var(--dropdown-hover-color) !important;
   }
 }
 
 hr {
   margin: 4px 10px;
-  background: rgba(128, 128, 128, 0.18);
+  background: #8080802e;
   height: 1px;
   box-shadow: none;
   border: none;
@@ -134,7 +130,7 @@ hr {
   padding: 10px 10px;
   display: flex;
   align-items: center;
-  color: var(--color-text);
+  color: var(--text-color);
   cursor: default;
   img {
     height: 38px;
@@ -161,6 +157,19 @@ hr {
     -webkit-line-clamp: 1;
     overflow: hidden;
     word-break: break-all;
+  }
+
+  img {
+    border-radius: 8px;
+    height: 46px;
+    width: 46px;
+    margin-right: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+  }
+
+  img.hover {
+    filter: drop-shadow(100 200 0 black);
   }
 }
 </style>

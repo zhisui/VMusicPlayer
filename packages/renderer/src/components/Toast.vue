@@ -12,7 +12,7 @@ const store = toastStore()
 <style lang="scss" scoped>
 .toast {
   position: fixed;
-  bottom: 64px;
+  bottom: 100px;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 14px;

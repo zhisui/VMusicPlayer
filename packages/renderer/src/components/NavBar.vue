@@ -14,7 +14,8 @@
     <div class="nav-middle">
       <router-link to="/"> 首页 </router-link>
       <router-link to="/explore"> 发现 </router-link>
-      <router-link to="/library"> 音乐库 </router-link>
+      <router-link v-if="isAccountLogin() === true" to="/library"> 音乐库 </router-link>
+      <router-link v-if="isAccountLogin() === false" to="/login"> 音乐库 </router-link>
     </div>
 
     <!-- 右边 -->
@@ -43,11 +44,14 @@
             <Icon icon="uiw:setting" class="icon" />
             设置
           </div>
-          <div class="item" @mousedown="toLogin">
+          <div v-if="isAccountLogin() === true" class="item" @mousedown="toLogout">
+            <Icon icon="ls:login" class="icon" />
+            登出
+          </div>
+          <div v-if="isAccountLogin() === false" class="item" @mousedown="toLogin">
             <Icon icon="ls:login" class="icon" />
             登录
           </div>
-          <!-- 退出的情况待写 -->
           <div class="item" @mousedown="toGithub">
             <Icon icon="grommet-icons:github" class="icon" />
             Github
@@ -61,19 +65,30 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import DropdownMenu from './DropdownMenu.vue'
 import IconButton from './IconButton.vue'
 
 import { userDataStore } from '@/store/userData'
+import { doLogout, isAccountLogin } from '@/utils/auth'
+
+// const electron = process.env.IS_ELECTRON === true ? window.require('electron') : null
+// const ipcRenderer = process.env.IS_ELECTRON === true ? electron.ipcRenderer : null
+// if (process.env.IS_ELECTRON === true) {
+//   ipcRenderer.on('isMaximized', (event, value) => {
+//     isWindowMaximized.value = value
+//   })
+// }
 
 const inputFocus = ref(false)
 const showMenu = ref(false)
 const keywords = ref('')
+// const isWindowMaximized = ref()
 
 const store = userDataStore()
 const router = useRouter()
+const route = useRoute()
 
 const go = (where: 'back' | 'forward') => {
   if (where === 'back') {
@@ -84,7 +99,14 @@ const go = (where: 'back' | 'forward') => {
 }
 
 const doSearch = () => {
-  console.log('ssss')
+  if (!keywords.value) return
+  if (route.name === 'search' && route.params.keywords === keywords.value) {
+    return
+  }
+  router.push({
+    name: 'search',
+    params: { keywords: keywords.value },
+  })
 }
 
 const toSetting = () => {
@@ -93,6 +115,12 @@ const toSetting = () => {
 
 const toLogin = () => {
   router.push({ name: 'login' })
+}
+const toLogout = () => {
+  const confirmInfo = window.confirm('确定要退出登录吗？')
+  if (!confirmInfo) return
+  doLogout()
+  router.push({ name: 'home' })
 }
 
 const toGithub = () => {
@@ -108,16 +136,28 @@ const avatarUrl = computed(() => {
 
 <style lang="scss" scoped>
 .container {
-  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   height: 64px;
-  backdrop-filter: saturate(180%) blur(20px);
-  background-color: var(--nav-bg-color);
-  z-index: 100;
   padding: {
     right: 10vw;
     left: 10vw;
+  }
+  backdrop-filter: saturate(180%) blur(20px);
+
+  background-color: var(--color-navbar-bg);
+  z-index: 100;
+  -webkit-app-region: drag;
+}
+
+@media (max-width: 1336px) {
+  .container {
+    padding: 0 5vw;
   }
 }
 
@@ -138,7 +178,7 @@ const avatarUrl = computed(() => {
     text-decoration: none;
     border-radius: 6px;
     padding: 6px 10px;
-    color: var(--text-color);
+    /* color: var(--text-color); */
     transition: all 0.2s;
     -webkit-user-drag: none;
     margin: {

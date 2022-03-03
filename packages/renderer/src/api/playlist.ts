@@ -29,6 +29,70 @@ export const getPlaylistDetail: GetPlaylistDetail = async (params) => {
 }
 
 /**
+ * 新建歌单
+ * 说明 : 调用此接口 , 传入歌单名字可新建歌单
+ * - name : 歌单名
+ * - privacy : 是否设置为隐私歌单，默认否，传'10'则设置成隐私歌单
+ * - type : 歌单类型,默认'NORMAL',传 'VIDEO'则为视频歌单
+ * @param {Object} params
+ * @param {string} params.name
+ * @param {number} params.privacy
+ * @param {string} params.type
+ */
+interface CreatePlaylistParams {
+  name: string
+  privacy?: number
+  type: string
+  timestamp?: number
+}
+type CreatePlaylist = (params: CreatePlaylistParams) => Promise<any>
+export const createPlaylist: CreatePlaylist = async (params) => {
+  params.timestamp = Date.now()
+  return request({
+    url: '/playlist/create',
+    method: 'post',
+    params,
+  })
+}
+
+/**
+ * 删除歌单
+ * 说明 : 调用此接口 , 传入歌单id可删除歌单
+ * - id : 歌单id,可多个,用逗号隔开
+ *  * @param {number} id
+ */
+export const deletePlaylist = async (id: number) => {
+  return request({
+    url: '/playlist/delete',
+    method: 'post',
+    params: { id },
+  })
+}
+
+/**
+ * 收藏/取消收藏歌单
+ * 说明 : 调用此接口, 传入类型和歌单 id 可收藏歌单或者取消收藏歌单
+ * - t : 类型,1:收藏,2:取消收藏
+ * - id : 歌单 id
+ * @param {Object} params
+ * @param {number} params.t
+ * @param {number} params.id
+ */
+type SubscribePlaylistParams = {
+  t: number
+  id: number
+  timestamp?: number
+}
+export const subscribePlaylist = async (params: SubscribePlaylistParams) => {
+  params.timestamp = Date.now()
+  return request({
+    url: '/playlist/subscribe',
+    method: 'post',
+    params,
+  })
+}
+
+/**
  * 对歌单添加或删除歌曲
  * 说明 : 调用此接口 , 可以添加歌曲到歌单或者从歌单删除某首歌曲 ( 需要登录 )
  * - op: 从歌单增加单曲为 add, 删除为 del
@@ -50,6 +114,99 @@ export const addOrRemoveTrackFromPlaylist: AddOrRemoveTrackFromPlaylist = async 
   return request({
     url: '/playlist/tracks',
     method: 'post',
+    params,
+  })
+}
+
+/**
+ * 每日推荐歌曲
+ * 说明 : 调用此接口 , 可获得每日推荐歌曲 ( 需要登录 )
+ * @param {Object} params
+ * @param {string} params.op
+ * @param {string} params.pid
+ */
+
+export const dailyRecommendTracks = async () => {
+  return request({
+    url: '/recommend/songs',
+    method: 'get',
+    params: { timestamp: Date.now() },
+  })
+}
+
+/**
+ * 所有榜单
+ * 说明 : 调用此接口,可获取所有榜单 接口地址 : /toplist
+ */
+export const toplists = async () => {
+  return request({
+    url: '/toplist',
+    method: 'get',
+  })
+}
+
+/**
+ * 推荐歌单
+ * 说明 : 调用此接口 , 可获取推荐歌单
+ * - limit: 取出数量 , 默认为 30 (不支持 offset)
+ * - 调用例子 : /personalized?limit=1
+ * @param {Object} params
+ * @param {number=} params.limit
+ */
+type RcommendPlaylistParams = { limit: number }
+export const recommendPlaylist = async (params: RcommendPlaylistParams) => {
+  return request({
+    url: '/personalized',
+    method: 'get',
+    params,
+  })
+}
+
+/**
+ * 获取精品歌单
+ * 说明 : 调用此接口 , 可获取精品歌单
+ * - cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部", 可从精品歌单标签列表接口获取(/playlist/highquality/tags)
+ * - limit: 取出歌单数量 , 默认为 20
+ * - before: 分页参数,取上一页最后一个歌单的 updateTime 获取下一页数据
+ * @param {Object} params
+ * @param {string} params.cat
+ * @param {number=} params.limit
+ * @param {number} params.before
+ */
+type HighQualityPlaylistParams = {
+  cat?: string
+  limit?: number
+  before?: number
+}
+export const highQualityPlaylist = async (params: HighQualityPlaylistParams) => {
+  return request({
+    url: '/top/playlist/highquality',
+    method: 'get',
+    params,
+  })
+}
+
+/**
+ * 歌单 ( 网友精选碟 )
+ * 说明 : 调用此接口 , 可获取网友精选碟歌单
+ * - order: 可选值为 'new' 和 'hot', 分别对应最新和最热 , 默认为 'hot'
+ * - cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部",可从歌单分类接口获取(/playlist/catlist)
+ * - limit: 取出歌单数量 , 默认为 50
+ * @param {Object} params
+ * @param {string} params.order
+ * @param {string} params.cat
+ * @param {number=} params.limit
+ */
+type TopPlaylistParams = {
+  order?: string
+  cat?: string
+  limit?: number
+  offset?: number
+}
+export const topPlaylist = async (params: TopPlaylistParams) => {
+  return request({
+    url: '/top/playlist',
+    method: 'get',
     params,
   })
 }

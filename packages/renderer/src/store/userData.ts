@@ -5,6 +5,7 @@ import { toastStore } from './toastStore'
 
 import { getPlaylistDetail } from '@/api/playlist'
 import { getTrackDetail, likeATrack } from '@/api/track'
+import { Profile } from '@/api/types/auth'
 import {
   cloudDisk,
   likedAlbums,
@@ -15,18 +16,23 @@ import {
   userPlaylist,
 } from '@/api/user'
 
-export const userDataStore = defineStore('userData', {
+export const userDataStore = defineStore<
+  string,
+  {
+    user: Partial<Profile>
+  } & Record<any, any>
+>('userData', {
   state: () => ({
     user: {
       userId: 0,
       avatarUrl: '',
       nickname: '',
     },
-    likedSongPlaylistID: 2046749523,
+    likedSongPlaylistID: 0,
     lastRefreshCookieDate: 0,
     loginMode: '',
     liked: {
-      playlists: [],
+      playlists: [{ id: 0 }],
       songs: [0],
       songsWithDetails: [],
       playHistory: {},
@@ -35,6 +41,7 @@ export const userDataStore = defineStore('userData', {
       cloudDisk: [],
       albums: [],
     },
+    libraryPlaylistFilter: '全部歌单',
   }),
 
   actions: {

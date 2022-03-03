@@ -25,6 +25,6 @@ export default defineComponent({
   border-radius: 8px;
   box-sizing: border-box;
   padding: 6px;
-  z-index: 1000;
+  z-index: 100000;
 }
 </style>

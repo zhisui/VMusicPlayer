@@ -141,7 +141,9 @@ export const likedMVs: LikedMVs = async (params) => {
 /**
  * 上传歌曲到云盘（需要登录）
  */
-export const uploadSong = async (file: string | Blob) => {
+
+type UploadSong = (file: string | Blob) => Promise<any>
+export const uploadSong: UploadSong = async (file: string | Blob) => {
   const formData = new FormData()
   formData.append('songFile', file)
   return request({

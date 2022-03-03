@@ -1,4 +1,7 @@
-import request from '../utils/request'
+import { LoginWithPhoneResponse } from './types/auth'
+import { ErrorResponse } from './types/error'
+
+import request from '@/utils/request'
 
 /** 注意：以下url为网易云音乐对应接口，不可随意更改
  @see https://neteasecloudmusicapi.vercel.app/#/?id=%e7%99%bb%e5%bd%95 */
@@ -10,13 +13,13 @@ type PhoneParams = {
   countryCode?: string
   md5_password?: string
 }
-type LoginWithPhone = (params: PhoneParams) => Promise<any>
-export const loginWithPhone: LoginWithPhone = async (params) => {
-  return request({
+
+export const loginWithPhone = async (params: PhoneParams) => {
+  return (request({
     url: '/login/cellphone',
     method: 'post',
     params,
-  })
+  }) as unknown) as Promise<LoginWithPhoneResponse | ErrorResponse>
 }
 
 // 邮箱登录
@@ -27,7 +30,7 @@ type EmailParams = {
 }
 
 type LoginWithEmail = (params: EmailParams) => Promise<any>
-export const loginWithEmail: LoginWithEmail = async (params) => {
+export const loginWithEmail: LoginWithEmail = (params) => {
   return request({
     url: './login',
     method: 'post',
@@ -38,7 +41,7 @@ export const loginWithEmail: LoginWithEmail = async (params) => {
 // 生成二维码key值
 
 type LoginQrCodeKey = () => Promise<any>
-export const loginQrCodeKey: LoginQrCodeKey = async () => {
+export const loginQrCodeKey: LoginQrCodeKey = () => {
   return request({
     url: '/login/qr/key',
     method: 'get',
@@ -55,7 +58,7 @@ type QrCodeparams = {
   timeStamp?: number
 }
 type CreateQrCode = (params: QrCodeparams) => Promise<any>
-export const createQrCode: CreateQrCode = async (params) => {
+export const createQrCode: CreateQrCode = (params) => {
   return request({
     url: '/login/qr/create',
     method: 'get',
@@ -71,7 +74,7 @@ export const createQrCode: CreateQrCode = async (params) => {
 803为授权登录成功(803状态码下会返回cookies)
 */
 type CheckQrCode = (key: string) => Promise<any>
-export const checkQrCode: CheckQrCode = async (key: string) => {
+export const checkQrCode: CheckQrCode = (key: string) => {
   return request({
     url: '/login/qr/check',
     method: 'get',
@@ -79,5 +82,16 @@ export const checkQrCode: CheckQrCode = async (key: string) => {
       key,
       timestamp: Date.now(),
     },
+  })
+}
+
+/**
+ * 退出登录
+ * 说明 : 调用此接口 , 可退出登录
+ */
+export const logout = () => {
+  return request({
+    url: '/logout',
+    method: 'post',
   })
 }

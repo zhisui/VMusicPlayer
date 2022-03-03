@@ -2,7 +2,8 @@
 import { Howl, Howler } from 'howler'
 import shuffle from 'lodash/shuffle'
 
-import { personalFM } from '../api/other'
+import { getArtist } from '../api/artist'
+import { fmTrash, personalFM } from '../api/other'
 import { lastfmStore } from '../store/lastfmStore'
 import { playerStore } from '../store/playerStore'
 import { settingStore } from '../store/settingStore'
@@ -53,8 +54,23 @@ class Player {
   _playlistSource: { type: string; id: number }
   _currentTrack: { id: number; dt: number; name: string; no: number; al: any; ar: any }
   _playNextList: number[]
-  _personalFMTrack: { id: number }
-  _personalFMNextTrack: { id: number }
+
+  _personalFMTrack: {
+    artists: { name: string; id: number }[]
+    album: { id: number; picUrl: string }
+    ar: object
+    name: string
+    id: number
+  }
+
+  _personalFMNextTrack: {
+    artists: { name: string; id: number }[]
+    album: { id: number; picUrl: string }
+    ar: object
+    name: string
+    id: number
+  }
+
   _howler: null
   _isPersonalFM: boolean
   createdBlobRecords: string[]
@@ -96,7 +112,7 @@ class Player {
     /**
  @see https://github.com/goldfire/howler.js#examples
   */
-    this._howler = null
+    this._howler = playerState.howler
     Object.defineProperty(this, '_howler', {
       enumerable: false,
     })
@@ -104,12 +120,39 @@ class Player {
     // 初始化
     this._init()
 
-    // window.vmplayermusic = {}
-    // window.vmplayermusic.player = this
+    window.vmplayermusic = {}
+    window.vmplayermusic.player = this
   }
 
   _init () {
-    console.log('待写')
+    this._loadSelfFromLocalStorage()
+    Howler.autoUnlock = false
+    Howler.usingWebAudio = true
+    Howler.volume(this.volume)
+
+    if (this._enabled) {
+      // 恢复当前播放歌曲
+      this._replaceCurrentTrack(this._currentTrack.id, false).then(() => {
+        this._howler?.seek(localStorage.getItem('playerCurrentTrackTime') ?? 0)
+      }) // update audio source and init howler
+      this._initMediaSession()
+    }
+
+    this._setIntervals()
+
+    // 初始化私人FM
+    if (
+      this._personalFMTrack.id === 0 ||
+      this._personalFMNextTrack.id === 0 ||
+      this._personalFMTrack.id === this._personalFMNextTrack.id
+    ) {
+      personalFM().then((result) => {
+        console.log(result)
+        this._personalFMTrack = result.data[0]
+        this._personalFMNextTrack = result.data[1]
+        return this._personalFMTrack
+      })
+    }
   }
 
   get repeatMode () {
@@ -231,6 +274,76 @@ class Player {
     const store = userDataStore()
     const likedSongs = store.liked.songs
     return likedSongs.includes(this.currentTrack.id)
+  }
+
+  _loadSelfFromLocalStorage () {
+    const player = JSON.parse(localStorage.getItem('player'))
+    if (!player) return
+    for (const [key, value] of Object.entries(player)) {
+      this[key] = value
+    }
+  }
+
+  _setIntervals () {
+    // 同步播放进度
+    // TODO: 如果 _progress 在别的地方被改变了，这个定时器会覆盖之前改变的值，是bug
+    setInterval(() => {
+      if (this._howler === null) return
+      this._progress = this._howler.seek()
+      localStorage.setItem('playerCurrentTrackTime', this._progress.toString())
+    }, 1000)
+  }
+
+  _initMediaSession () {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => {
+        this.play()
+      })
+      navigator.mediaSession.setActionHandler('pause', () => {
+        this.pause()
+      })
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        this.playPrevTrack()
+      })
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        if (this.isPersonalFM) {
+          this.playNextFMTrack()
+        } else {
+          this.playNextTrack()
+        }
+      })
+      navigator.mediaSession.setActionHandler('stop', () => {
+        this.pause()
+      })
+      navigator.mediaSession.setActionHandler('seekto', (event) => {
+        if (event.seekTime!) {
+          this.seek(event.seekTime)
+          this._updateMediaSessionPositionState()
+        }
+      })
+      navigator.mediaSession.setActionHandler('seekbackward', (event) => {
+        this.seek(this.seek() - (event.seekOffset || 10))
+        this._updateMediaSessionPositionState()
+      })
+      navigator.mediaSession.setActionHandler('seekforward', (event) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        this.seek(this.seek() + (event.seekOffset || 10))
+        this._updateMediaSessionPositionState()
+      })
+    }
+  }
+
+  _updateMediaSessionPositionState () {
+    if (!('mediaSession' in navigator)) {
+      return
+    }
+    if ('setPositionState' in navigator.mediaSession) {
+      navigator.mediaSession.setPositionState({
+        duration: ~~(this.currentTrack.dt / 1000),
+        playbackRate: 1.0,
+        position: this.seek(),
+      })
+    }
   }
 
   // 随机播放列表歌曲, 0表示默认选中第一首歌
@@ -494,8 +607,8 @@ class Player {
     this._personalFMNextLoading = true
     return personalFM()
       .then((result) => {
-        if (!result || !result.data) {
-          this._personalFMNextTrack = { id: 0 }
+        if (!result.data) {
+          this._personalFMNextTrack = undefined
         } else {
           this._personalFMNextTrack = result.data[0]
           this._cacheNextTrack() // cache next track
@@ -504,10 +617,18 @@ class Player {
         return [true, this._personalFMNextTrack]
       })
       .catch(() => {
-        this._personalFMNextTrack = { id: 0 }
+        this._personalFMNextTrack = undefined
         this._personalFMNextLoading = false
         return [false, this._personalFMNextTrack]
       })
+  }
+
+  _pauseDiscordPresence (track: any) {
+    const store = settingStore()
+    if (process.env.IS_ELECTRON !== true || !store.enableDiscordRichPresence) {
+      return null
+    }
+    ipcRenderer.send('pauseDiscordPresence', track)
   }
 
   setOutputDevice () {
@@ -518,6 +639,20 @@ class Player {
       const store = settingStore()
       this._howler?._sounds[0]._node.setSinkId(store.outputDevice)
     }
+  }
+
+  switchRepeatMode () {
+    if (this._repeatMode === 'on') {
+      this._repeatMode = 'one'
+    } else if (this._repeatMode === 'one') {
+      this._repeatMode = 'off'
+    } else {
+      this._repeatMode = 'on'
+    }
+  }
+
+  switchShuffle () {
+    this.shuffle = !this.shuffle
   }
 
   sendSelfToIpcMain () {
@@ -558,11 +693,19 @@ class Player {
     this._replaceCurrentTrack(id)
   }
 
+  playArtistByID (id: number, trackID = 0) {
+    getArtist({ id }).then((data) => {
+      const trackIDs = data.hotSongs.map((t: any) => t.id)
+      this.replacePlaylist(trackIDs, id, 'artist', trackID)
+    })
+  }
+
   replacePlaylist (
     trackIDs: number[],
+    // eslint-disable-next-line @typescript-eslint/default-param-last
     playlistSourceID: number,
     playlistSourceType: string,
-    autoPlayTrackID = 0
+    autoPlayTrackID = 0 // 默认第一首，传入歌曲id
   ) {
     this._isPersonalFM = false
     if (!this._enabled) this._enabled = true
@@ -589,6 +732,24 @@ class Player {
       } else {
         this.playNextTrack()
       }
+    }
+  }
+
+  playPersonalFM () {
+    this._isPersonalFM = true
+    if (!this._enabled) this._enabled = true
+    if (this._currentTrack.id !== this._personalFMTrack.id) {
+      this._replaceCurrentTrack(this._personalFMTrack.id).then(() => this.playOrPause())
+    } else {
+      this.playOrPause()
+    }
+  }
+
+  async moveToFMTrash () {
+    this._isPersonalFM = true
+    const id = this._personalFMTrack.id
+    if (await this.playNextFMTrack()) {
+      fmTrash({ id })
     }
   }
 
@@ -659,6 +820,13 @@ class Player {
     return true
   }
 
+  pause () {
+    this._howler?.pause()
+    this._setPlaying(false)
+    setTitle(null)
+    this._pauseDiscordPresence(this._currentTrack)
+  }
+
   play () {
     if (this._howler?.playing()) return
     this._howler?.play()
@@ -676,6 +844,14 @@ class Player {
         trackNumber: this.currentTrack.no,
         duration: ~~(this.currentTrack.dt / 1000),
       })
+    }
+  }
+
+  playOrPause () {
+    if (this._howler?.playing()) {
+      this.pause()
+    } else {
+      this.play()
     }
   }
 
