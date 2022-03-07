@@ -1,4 +1,4 @@
-# 轻量版音乐播放器（更多功能开发中）
+# 轻量版音乐播放器
 ### 技术栈
 vue3 + pinia + vue-Router + typeScript + sass
 ### 目前可支持功能
