@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <NavBar />
-
     <main>
       <keep-alive>
         <router-view v-if="route.meta.keepAlive"></router-view>
@@ -9,9 +8,9 @@
       <router-view v-if="!route.meta.keepAlive"></router-view>
     </main>
 
-    <transition name="slide-up">
+    <!-- <transition name="slide-up">
       <Player v-if="enablePlayer" v-show="showPlayer" />
-    </transition>
+    </transition> -->
 
     <Toast />
     <ModalNewPlaylist v-if="isAccountLogin()" />
@@ -19,35 +18,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+// import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ModalNewPlaylist from './components/ModalNewPlaylist.vue'
-import Player from './components/Player.vue'
+// import Player from './components/Player.vue'
 import Toast from './components/Toast.vue'
-import { playerStore } from './store/playerStore'
+// import { playerStore } from './store/playerStore'
 // import { settingStore } from './store/settingStore'
 import { isAccountLogin } from './utils/auth'
 
 import NavBar from '@/components/NavBar.vue'
 
 // const isElectron = ref(process.env.IS_ELECTRON)
-const storePlayer = playerStore()
+// const storePlayer = playerStore()
 const route = useRoute()
-const enablePlayer = computed(() => {
-  return storePlayer.enabled && route.name !== 'lastfmCallback'
-})
+// const enablePlayer = computed(() => {
+//   return storePlayer.enabled && route.name !== 'lastfmCallback'
+// })
 
 // eslint-disable-next-line vue/return-in-computed-property
-const showPlayer = computed(() => {
-  if (route.name) {
-    return (
-      ['mv', 'loginUsername', 'login', 'loginAccount', 'lastfmCallback'].includes(
-        route.name.toString()
-      ) === false
-    )
-  }
-})
+// const showPlayer = computed(() => {
+//   if (route.name) {
+//     return (
+//       ['mv', 'loginUsername', 'login', 'loginAccount', 'lastfmCallback'].includes(
+//         route.name.toString()
+//       ) === false
+//     )
+//   }
+// })
 </script>
 
 <style lang="scss" scoped>
